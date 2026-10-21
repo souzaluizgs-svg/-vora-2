@@ -1,0 +1,1253 @@
+<title>Braço Robótico Mark 2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: manual de bancada. Coluna de leitura estreita, diagramas e tabelas largos; cores dos fios (vermelho +, marrom GND, laranja sinal) viram linguagem visual do guia inteiro. */
+:root {
+  --bg: #EDF0F3;
+  --surface: #FFFFFF;
+  --surface-2: #F5F7F9;
+  --ink: #121B24;
+  --ink-2: #44525F;
+  --muted: #687684;
+  --line: #D4DAE0;
+  --line-2: #A9B5C0;
+  --accent: #2B55D6;
+  --accent-soft: #E3E9FB;
+  --accent-ink: #1E3FA3;
+  --servo: #3A61DD;
+  --on-color: #FFFFFF;
+  --pcb: #1B6A72;
+  --pcb-ink: #E6F3F4;
+  --part: #262B31;
+  --on-part: #E9EDF1;
+  --metal: #A7AFB8;
+  --magnet: #8D97A2;
+  --glove: #E2E6EB;
+  --glove-2: #C9D0D8;
+  --w-pos: #D1372D;
+  --w-gnd: #6F4A2E;
+  --w-sig: #E8841A;
+  --w-out: #168F5E;
+  --w-3v3: #9844C6;
+  --w-tx: #2B55D6;
+  --ok: #217D4C;
+  --ok-soft: #E0F2E7;
+  --warn: #9C6205;
+  --warn-soft: #FAEFD6;
+  --bad: #B3302A;
+  --bad-soft: #FAE3E1;
+  --stage: #F5F7F9;
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --f-display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --read: 44rem;
+  --wide: 70rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1318; --surface: #141C24; --surface-2: #1A242E; --ink: #E3E9EF; --ink-2: #A6B3C0; --muted: #7E8C99;
+    --line: #26323D; --line-2: #3B4957; --accent: #7C9BFF; --accent-soft: #1A2646; --accent-ink: #AFC2FF;
+    --servo: #4F74EA; --pcb: #1D5A61; --pcb-ink: #DDEFF1; --part: #0A0D10; --on-part: #DCE2E8; --metal: #8D96A0; --magnet: #7A8591;
+    --glove: #25303B; --glove-2: #34414E;
+    --w-pos: #EF6157; --w-gnd: #B98A66; --w-sig: #F49B3B; --w-out: #3DBF89; --w-3v3: #C47DEB; --w-tx: #7C9BFF;
+    --ok: #5BCB8C; --ok-soft: #12301F; --warn: #E6AE48; --warn-soft: #33270E; --bad: #F07B71; --bad-soft: #3A1815;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1318; --surface: #141C24; --surface-2: #1A242E; --ink: #E3E9EF; --ink-2: #A6B3C0; --muted: #7E8C99;
+  --line: #26323D; --line-2: #3B4957; --accent: #7C9BFF; --accent-soft: #1A2646; --accent-ink: #AFC2FF;
+  --servo: #4F74EA; --pcb: #1D5A61; --pcb-ink: #DDEFF1; --part: #0A0D10; --on-part: #DCE2E8; --metal: #8D96A0; --magnet: #7A8591;
+  --glove: #25303B; --glove-2: #34414E;
+  --w-pos: #EF6157; --w-gnd: #B98A66; --w-sig: #F49B3B; --w-out: #3DBF89; --w-3v3: #C47DEB; --w-tx: #7C9BFF;
+  --ok: #5BCB8C; --ok-soft: #12301F; --warn: #E6AE48; --warn-soft: #33270E; --bad: #F07B71; --bad-soft: #3A1815;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 64px); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 17px; line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+.wrap { max-width: var(--wide); margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.read { max-width: var(--read); }
+h1, h2, h3, h4 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(2.1rem, 6.2vw, 3.9rem); font-weight: 850; font-stretch: 112%; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.55rem, 3.4vw, 2.15rem); font-weight: 800; font-stretch: 108%; }
+h3 { font-size: 1.22rem; font-weight: 750; font-stretch: 104%; }
+h4 { font-size: 1.02rem; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--accent-ink); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+code, kbd, .mono { font-family: var(--f-mono); font-size: 0.86em; }
+:not(pre) > code { background: var(--surface-2); border: 1px solid var(--line); padding: 0.05em 0.35em; border-radius: 5px; white-space: nowrap; }
+strong { font-weight: 700; }
+.eyebrow { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.flow { display: flex; flex-direction: column; gap: 1rem; }
+.flow-lg { display: flex; flex-direction: column; gap: 1.6rem; }
+ul.list, ol.list { margin: 0; padding-left: 1.3rem; display: flex; flex-direction: column; gap: 0.45rem; }
+.muted { color: var(--muted); }
+.small { font-size: 0.9rem; }
+
+/* capa */
+.capa { background: var(--surface); border-bottom: 1px solid var(--line); }
+.capa .wrap { padding-block: 2.4rem 2rem; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 2rem; align-items: center; }
+.capa .lede { font-size: 1.12rem; color: var(--ink-2); max-width: 38rem; }
+.capa figure { margin: 0; }
+.capa img { display: block; width: 100%; height: auto; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+.capa figcaption { font-size: 0.82rem; color: var(--muted); margin-top: 0.4rem; }
+.ficha { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 0; }
+.ficha div { padding: 0.6rem 0.8rem; border-top: 1px solid var(--line); min-width: 0; }
+.ficha div:nth-child(-n+2) { border-top: 0; }
+.ficha div:nth-child(odd) { border-right: 1px solid var(--line); }
+.ficha dt { font-family: var(--f-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.ficha dd { margin: 0.1rem 0 0; font-weight: 700; font-size: 0.96rem; }
+@media (max-width: 820px) { .capa .wrap { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 420px) { .ficha { grid-template-columns: minmax(0, 1fr); } .ficha div:nth-child(odd) { border-right: 0; } .ficha div:nth-child(2) { border-top: 1px solid var(--line); } }
+
+/* navegação */
+nav.indice { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9; background: color-mix(in srgb, var(--surface) 94%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+nav.indice .wrap { overflow-x: auto; scrollbar-width: none; }
+nav.indice .wrap::-webkit-scrollbar { display: none; }
+nav.indice ol { list-style: none; margin: 0; padding: 0.55rem 0; display: flex; gap: 0.35rem; white-space: nowrap; }
+nav.indice a { display: block; text-decoration: none; color: var(--ink-2); font-size: 0.86rem; padding: 0.3rem 0.7rem; border-radius: 999px; border: 1px solid transparent; }
+nav.indice a:hover { border-color: var(--line-2); color: var(--ink); }
+
+/* seções */
+main section { padding-block: 3rem 0.5rem; }
+main section > .wrap { display: flex; flex-direction: column; gap: 1.4rem; }
+.sec-head { display: flex; flex-direction: column; gap: 0.5rem; max-width: var(--read); }
+.sec-head .num { font-family: var(--f-mono); font-size: 0.78rem; color: var(--accent-ink); font-weight: 600; letter-spacing: 0.08em; }
+.sec-head p { color: var(--ink-2); font-size: 1.05rem; }
+hr.sep { border: 0; border-top: 1px solid var(--line); margin: 3rem 0 0; }
+
+/* veredito */
+.decisoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.8rem; }
+.decisao { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+.decisao .k { font-family: var(--f-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.decisao .v { font-family: var(--f-display); font-weight: 780; font-size: 1.12rem; font-stretch: 104%; line-height: 1.2; }
+.decisao p { font-size: 0.93rem; color: var(--ink-2); }
+
+/* críticas */
+.criticas { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); }
+.critica { display: grid; grid-template-columns: 7.2rem minmax(0, 1fr); gap: 1rem; padding: 1.1rem 0; border-bottom: 1px solid var(--line); }
+.critica h3 { margin-bottom: 0.35rem; }
+.critica p + p { margin-top: 0.5rem; }
+.critica .fix { color: var(--ink); }
+.critica .fix strong { color: var(--accent-ink); }
+@media (max-width: 560px) { .critica { grid-template-columns: minmax(0, 1fr); gap: 0.4rem; } }
+.chip { display: inline-flex; align-items: center; gap: 0.35rem; font-family: var(--f-mono); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.22rem 0.55rem; border-radius: 6px; align-self: start; justify-self: start; white-space: nowrap; }
+.chip::before { content: ""; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: currentColor; }
+.chip.grave { color: var(--bad); background: var(--bad-soft); }
+.chip.medio { color: var(--warn); background: var(--warn-soft); }
+.chip.ok { color: var(--ok); background: var(--ok-soft); }
+.chip.info { color: var(--accent-ink); background: var(--accent-soft); }
+
+/* caixas de aviso */
+.aviso { border-radius: 12px; padding: 0.95rem 1.1rem; display: flex; flex-direction: column; gap: 0.45rem; max-width: var(--read); }
+.aviso .rot { font-family: var(--f-mono); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+.aviso.perigo { background: var(--bad-soft); } .aviso.perigo .rot { color: var(--bad); }
+.aviso.cuidado { background: var(--warn-soft); } .aviso.cuidado .rot { color: var(--warn); }
+.aviso.dica { background: var(--accent-soft); } .aviso.dica .rot { color: var(--accent-ink); }
+.aviso.bom { background: var(--ok-soft); } .aviso.bom .rot { color: var(--ok); }
+
+/* figuras */
+figure.dg { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+figure.dg .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+figure.dg svg { display: block; width: 100%; min-width: 640px; height: auto; }
+figure.dg.estreito svg { min-width: 520px; max-width: 760px; margin: 0 auto; }
+figure.dg figcaption { padding: 0.75rem 1.1rem 0.9rem; border-top: 1px solid var(--line); font-size: 0.9rem; color: var(--ink-2); }
+figure.dg figcaption strong { color: var(--ink); }
+.dica-scroll { display: none; font-size: 0.78rem; color: var(--muted); padding: 0.4rem 1.1rem 0; font-family: var(--f-mono); }
+@media (max-width: 700px) { .dica-scroll { display: block; } }
+
+/* desenho svg */
+svg text { font-family: var(--f-body); }
+.d-box { fill: var(--surface-2); stroke: var(--line-2); stroke-width: 1.5; }
+.d-t { fill: var(--ink); font-family: var(--f-display); font-weight: 800; font-size: 15px; letter-spacing: 0.04em; }
+.d-s { fill: var(--ink-2); font-size: 13px; }
+.d-l { fill: var(--ink-2); font-family: var(--f-mono); font-size: 11.5px; }
+.d-lb { fill: var(--ink); font-family: var(--f-mono); font-size: 12px; font-weight: 600; }
+.d-w { fill: none; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.d-bus { fill: none; stroke-width: 5; stroke-linecap: round; }
+.d-thin { fill: none; stroke: var(--ink-2); stroke-width: 1.4; }
+.c-pos { stroke: var(--w-pos); } .c-gnd { stroke: var(--w-gnd); } .c-sig { stroke: var(--w-sig); } .c-out { stroke: var(--w-out); } .c-3v3 { stroke: var(--w-3v3); } .c-tx { stroke: var(--w-tx); } .c-ink { stroke: var(--ink-2); } .c-acc { stroke: var(--accent); }
+.f-pos { fill: var(--w-pos); } .f-gnd { fill: var(--w-gnd); } .f-sig { fill: var(--w-sig); } .f-out { fill: var(--w-out); } .f-3v3 { fill: var(--w-3v3); } .f-tx { fill: var(--w-tx); } .f-acc { fill: var(--accent); } .f-ink { fill: var(--ink-2); }
+.d-pcb { fill: var(--pcb); } .d-pcbt { fill: var(--pcb-ink); font-family: var(--f-mono); font-size: 10.5px; font-weight: 600; }
+.d-part { fill: var(--part); } .d-partt { fill: var(--on-part); font-family: var(--f-mono); font-size: 10px; font-weight: 600; }
+.d-metal { fill: var(--metal); }
+.d-servo { fill: var(--servo); } .d-servot { fill: var(--on-color); font-family: var(--f-display); font-weight: 800; font-size: 14px; }
+.d-servos { fill: var(--on-color); font-size: 10.5px; }
+.d-mag { fill: var(--magnet); stroke: var(--ink-2); stroke-width: 1.2; }
+.d-glove { fill: var(--glove); stroke: var(--line-2); stroke-width: 1.5; }
+.d-glove2 { fill: var(--glove-2); }
+.d-bad { fill: var(--bad-soft); stroke: var(--bad); stroke-width: 1.5; }
+.d-badt { fill: var(--bad); font-family: var(--f-mono); font-weight: 600; font-size: 12px; letter-spacing: 0.1em; }
+.d-x { stroke: var(--bad); stroke-width: 5; stroke-linecap: round; }
+.d-dot-gnd { fill: var(--w-gnd); } .d-dot-pos { fill: var(--w-pos); } .d-dot-3v3 { fill: var(--w-3v3); }
+
+/* legenda das cores dos fios */
+.fios { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; font-size: 0.88rem; color: var(--ink-2); }
+.fios span { display: inline-flex; align-items: center; gap: 0.45rem; }
+.fios i { display: inline-block; width: 1.6rem; height: 4px; border-radius: 2px; }
+
+/* tabelas */
+.tabela { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--surface-2); white-space: nowrap; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td .sub { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 0.15rem; }
+table.compra td:first-child { min-width: 12rem; }
+table.compra td:nth-child(4) { min-width: 15rem; }
+.tag-v { font-family: var(--f-mono); font-size: 0.68rem; font-weight: 600; padding: 0.12rem 0.4rem; border-radius: 5px; white-space: nowrap; }
+.tag-v.ambas { background: var(--accent-soft); color: var(--accent-ink); }
+.tag-v.v1 { background: var(--ok-soft); color: var(--ok); }
+.tag-v.v2 { background: var(--warn-soft); color: var(--warn); }
+.tag-v.opcional { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+
+/* duas colunas */
+.duas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+@media (max-width: 760px) { .duas { grid-template-columns: minmax(0, 1fr); } }
+.painel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.55rem; min-width: 0; }
+
+/* galeria de componentes */
+.galeria { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.8rem; }
+@media (max-width: 760px) { .galeria { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.peca { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.peca .foto { background: var(--stage); height: 10.5rem; display: flex; align-items: center; justify-content: center; padding: 0.8rem; border-bottom: 1px solid var(--line); }
+.peca .foto img { max-height: 8.9rem; max-width: 100%; width: auto; height: auto; object-fit: contain; }
+.peca .txt { padding: 0.7rem 0.85rem 0.85rem; display: flex; flex-direction: column; gap: 0.2rem; }
+.peca .txt strong { font-family: var(--f-display); font-size: 1rem; font-weight: 750; }
+.peca .txt span { font-size: 0.86rem; color: var(--ink-2); }
+
+/* etapas */
+ol.etapas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; counter-reset: et; border-left: 2px solid var(--line); margin-left: 0.9rem; }
+ol.etapas > li { counter-increment: et; position: relative; padding: 0 0 1.5rem 1.6rem; display: flex; flex-direction: column; gap: 0.35rem; }
+ol.etapas > li::before { content: counter(et); position: absolute; left: -1rem; top: -0.1rem; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); color: var(--accent-ink); font-family: var(--f-mono); font-weight: 600; font-size: 0.85rem; display: grid; place-items: center; }
+ol.etapas .pronto { font-size: 0.9rem; color: var(--ok); }
+ol.etapas .pronto::before { content: "Pronto quando: "; font-weight: 700; }
+
+/* código */
+.codigo { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.codigo header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.6rem 0.8rem 0.6rem 1rem; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+.codigo header .nome { font-family: var(--f-mono); font-weight: 600; font-size: 0.88rem; }
+.codigo header .placa { font-size: 0.82rem; color: var(--muted); }
+.codigo button { font: 600 0.82rem var(--f-body); color: var(--accent-ink); background: var(--surface); border: 1px solid var(--line-2); border-radius: 8px; padding: 0.35rem 0.75rem; cursor: pointer; }
+.codigo button:hover { border-color: var(--accent); }
+.codigo pre { margin: 0; max-height: 34rem; overflow: auto; padding: 0.9rem 1rem; font-family: var(--f-mono); font-size: 0.8rem; line-height: 1.55; tab-size: 2; color: var(--ink); }
+.codigo pre .cm { color: var(--muted); font-style: italic; }
+.codigo pre .pp { color: var(--w-3v3); }
+.codigo pre .kw { color: var(--accent-ink); font-weight: 600; }
+.codigo pre .st { color: var(--w-out); }
+.codigo .desc { padding: 0.6rem 1rem; font-size: 0.88rem; color: var(--ink-2); border-bottom: 1px solid var(--line); }
+
+/* perguntas */
+.qa { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); max-width: var(--read); }
+.qa details { border-bottom: 1px solid var(--line); padding: 0.85rem 0; }
+.qa summary { cursor: pointer; font-weight: 700; list-style: none; display: flex; gap: 0.6rem; }
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary::before { content: "+"; font-family: var(--f-mono); color: var(--accent-ink); width: 1rem; flex: none; }
+.qa details[open] summary::before { content: "−"; }
+.qa details p { margin-top: 0.5rem; padding-left: 1.6rem; color: var(--ink-2); }
+
+/* gráfico */
+.grafico { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 1rem 1rem 0.6rem; display: flex; flex-direction: column; gap: 0.6rem; position: relative; }
+.grafico .tit { font-family: var(--f-display); font-weight: 760; font-size: 1.05rem; }
+.grafico .sub { font-size: 0.88rem; color: var(--ink-2); }
+.grafico .legenda { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.85rem; color: var(--ink-2); }
+.grafico .legenda span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.grafico .legenda i { width: 1.1rem; height: 3px; border-radius: 2px; display: inline-block; }
+.grafico .area { position: relative; overflow-x: auto; }
+.grafico svg { display: block; width: 100%; min-width: 560px; height: auto; touch-action: pan-y; }
+.g-grid { stroke: var(--line); stroke-width: 1; }
+.g-axis { fill: var(--muted); font-family: var(--f-mono); font-size: 11px; }
+.g-ref { stroke: var(--ink-2); stroke-width: 1; }
+.g-reft { fill: var(--ink-2); font-family: var(--f-mono); font-size: 11px; }
+.g-band { fill: var(--accent-soft); }
+.g-bandt { fill: var(--accent-ink); font-family: var(--f-mono); font-size: 11px; font-weight: 600; }
+.g-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.g-cross { stroke: var(--ink-2); stroke-width: 1; }
+.g-dot { stroke: var(--surface); stroke-width: 2; }
+.tooltip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line-2); border-radius: 8px; padding: 0.45rem 0.6rem; font-size: 0.8rem; box-shadow: 0 6px 18px rgba(0,0,0,.12); min-width: 9.5rem; }
+.tooltip b { font-family: var(--f-mono); font-size: 0.78rem; }
+.tooltip div { display: flex; align-items: center; gap: 0.4rem; justify-content: space-between; font-variant-numeric: tabular-nums; }
+.tooltip i { width: 0.6rem; height: 0.6rem; border-radius: 50%; display: inline-block; }
+.grafico details summary { cursor: pointer; font-size: 0.85rem; color: var(--accent-ink); padding: 0.3rem 0; }
+
+footer.fim { margin-top: 3rem; border-top: 1px solid var(--line); background: var(--surface); }
+footer.fim .wrap { padding-block: 2rem 2.6rem; display: flex; flex-direction: column; gap: 1rem; font-size: 0.88rem; color: var(--ink-2); }
+footer.fim ul { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.3rem; }
+footer.fim a { word-break: break-word; }
+@media print {
+  nav.indice, body::before, .dica-scroll, .codigo button { display: none !important; }
+  body { font-size: 11.5pt; }
+  main section { padding-block: 1.2rem 0; break-inside: auto; }
+  figure.dg, .grafico, .painel, .decisao, .aviso, .peca { break-inside: avoid; }
+  figure.dg .scroll, .tabela, .grafico .area { overflow: visible; }
+  figure.dg svg, .grafico svg { min-width: 0; }
+  .codigo pre { max-height: none; overflow: visible; white-space: pre-wrap; word-break: break-word; font-size: 7.5pt; }
+  .tabela table { font-size: 9pt; }
+  .capa .wrap { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
+  .capa img { max-height: 9cm; object-fit: contain; }
+}
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <marker id="ah-out" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-out"/></marker>
+    <marker id="ah-sig" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-sig"/></marker>
+    <marker id="ah-pos" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-pos"/></marker>
+    <marker id="ah-tx" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-tx"/></marker>
+    <marker id="ah-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-ink"/></marker>
+    <marker id="ah-acc" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-acc"/></marker>
+  </defs>
+</svg>
+<header class="capa">
+  <div class="wrap">
+    <div class="flow">
+      <span class="eyebrow">Guia de montagem · Arduino Uno · 4 servos · joysticks</span>
+      <h1>Braço Robótico Mark 2</h1>
+      <p class="lede">O kit vem completo. Este guia mostra como ligar a energia sem queimar nada, como fazer o braço gravar e repetir movimentos (a parte que é sua, além do manual) e como apresentar.</p>
+      <dl class="ficha">
+        <div><dt>Kit</dt><dd>MakerQuest Mark 2 · R$ 210</dd></div>
+        <div><dt>Controlador</dt><dd>Arduino Uno R3 + Shield V5</dd></div>
+        <div><dt>Juntas</dt><dd>4 × SG90: base, ombro, cotovelo, garra</dd></div>
+        <div><dt>Controle</dt><dd>2 joysticks XY com clique</dd></div>
+        <div><dt>Energia dos servos</dt><dd>Fonte 5 V 2 A no borne da shield</dd></div>
+        <div><dt>Diferencial</dt><dd>Gravar e repetir até 40 posições</dd></div>
+      </dl>
+    </div>
+    <figure>
+      <svg viewBox="0 0 520 420" role="img" aria-labelledby="hero-t" style="width:100%;height:auto;display:block;background:var(--surface-2);border-radius:14px;border:1px solid var(--line)">
+        <title id="hero-t">Desenho do braço robótico com as quatro juntas: base, ombro, cotovelo e garra</title>
+        <ellipse cx="250" cy="372" rx="150" ry="24" class="d-glove"/>
+        <rect x="195" y="292" width="110" height="80" rx="14" class="d-glove"/>
+        <path d="M250,282 L322,160" style="stroke:var(--glove-2);stroke-width:38;stroke-linecap:round;fill:none"/>
+        <path d="M322,160 L440,192" style="stroke:var(--glove-2);stroke-width:30;stroke-linecap:round;fill:none"/>
+        <path d="M440,192 L488,164 M440,192 L490,222" style="stroke:var(--ink-2);stroke-width:9;stroke-linecap:round;fill:none"/>
+        <circle cx="250" cy="334" r="15" class="d-servo"/>
+        <circle cx="250" cy="282" r="19" class="d-servo"/>
+        <circle cx="322" cy="160" r="17" class="d-servo"/>
+        <circle cx="440" cy="192" r="14" class="d-servo"/>
+        <text class="d-lb" x="182" y="339" text-anchor="end">base</text>
+        <text class="d-lb" x="222" y="270" text-anchor="end">ombro</text>
+        <text class="d-lb" x="322" y="124" text-anchor="middle">cotovelo</text>
+        <text class="d-lb" x="470" y="258" text-anchor="middle">garra</text>
+        <text class="d-l" x="24" y="30">4 juntas = 4 servos SG90</text>
+      </svg>
+      <figcaption>As quatro juntas do braço. Cada círculo azul é um servo.</figcaption>
+    </figure>
+  </div>
+</header>
+
+<nav class="indice" aria-label="Seções do guia">
+  <div class="wrap">
+    <ol>
+      <li><a href="#resumo">Resumo</a></li>
+      <li><a href="#fraquezas">Pontos fracos</a></li>
+      <li><a href="#funciona">Como funciona</a></li>
+      <li><a href="#energia">Energia</a></li>
+      <li><a href="#ligacoes">Ligações</a></li>
+      <li><a href="#codigo">Código</a></li>
+      <li><a href="#gravar">Gravar e repetir</a></li>
+      <li><a href="#ordem">Ordem e calendário</a></li>
+      <li><a href="#problemas">Problemas</a></li>
+      <li><a href="#banca">Banca</a></li>
+      <li><a href="#dia">Dia D</a></li>
+      <li><a href="#futuro">Próximos projetos</a></li>
+    </ol>
+  </div>
+</nav>
+
+<main>
+
+<section id="resumo">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">RESUMO</span>
+      <h2>O que fazer, em seis decisões</h2>
+    </div>
+    <div class="decisoes" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr))">
+      <div class="decisao"><span class="k">Hoje</span><span class="v">Comprar o kit e baixar o manual</span><p>Ele chega no sábado. Baixe o PDF do manual assim que comprar e guarde uma cópia: ele vale metade do kit.</p></div>
+      <div class="decisao"><span class="k">Energia</span><span class="v">Fonte no borne, jumper SEL fora</span><p>A fonte de 5 V vai no borne azul da shield, nunca no conector P4 do Uno. O Uno fica na USB.</p></div>
+      <div class="decisao"><span class="k">Montagem</span><span class="v">Servos em 90° antes de parafusar</span><p>Assim cada junta tem curso para os dois lados e nenhum servo começa forçando.</p></div>
+      <div class="decisao"><span class="k">Primeiro teste</span><span class="v">Rode o código do manual</span><p>Se ele funcionar, o hardware está certo. Só depois grave o programa deste guia.</p></div>
+      <div class="decisao"><span class="k">Diferencial</span><span class="v">Gravar e repetir movimentos</span><p>O braço aprende uma tarefa com os joysticks e repete sozinho. É o que tira o projeto do “montei o kit”.</p></div>
+      <div class="decisao"><span class="k">Apresentação</span><span class="v">Pegar e levar um objeto</span><p>Grave o braço pegando uma tampinha e deixando em outro lugar, em loop. É o momento que a banca lembra.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="fraquezas">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">CRÍTICA</span>
+      <h2>Onde este plano está fraco</h2>
+      <p>Trocar de projeto foi uma boa decisão, mas o kit traz riscos próprios.</p>
+    </div>
+    <div class="criticas read">
+      <div class="critica">
+        <span class="chip grave">Grave</span>
+        <div>
+          <h3>Kit montado não é projeto</h3>
+          <p>Se você montar o braço e rodar o código do manual, a banca vê alguém que seguiu instruções. Em escola técnica isso pesa contra.</p>
+          <p class="fix"><strong>O que fazer:</strong> use o programa deste guia, que tem controle por velocidade, limites de segurança e <strong>gravar e repetir</strong> com memória permanente. Na apresentação, diga claramente o que veio pronto e o que você fez.</p>
+        </div>
+      </div>
+      <div class="critica">
+        <span class="chip medio">Médio</span>
+        <div>
+          <h3>Confirme que o professor aceita um kit comprado</h3>
+          <p>“Tema livre” nem sempre quer dizer “pode comprar pronto”. Pergunte e já conte qual é o seu diferencial.</p>
+        </div>
+      </div>
+      <div class="critica">
+        <span class="chip medio">Médio</span>
+        <div>
+          <h3>A fonte de 2 A é justa</h3>
+          <p>Um SG90 travado puxa até uns 0,7 A. Com os quatro forçando juntos, passa de 2,5 A. Com joystick você mexe uma ou duas juntas por vez e não há problema. Ao repetir, porém, todas andam juntas.</p>
+          <p class="fix"><strong>O que fazer:</strong> o código já limita a velocidade. Não feche a garra num objeto grande demais (ela fica forçando) e, se o Uno ou os servos reiniciarem, reduza <code>VEL_REPETIR</code>.</p>
+        </div>
+      </div>
+      <div class="critica">
+        <span class="chip medio">Médio</span>
+        <div>
+          <h3>O ombro carrega o braço inteiro</h3>
+          <p>É a junta que mais força. Um SG90 clone pode tremer ou não segurar com o braço esticado.</p>
+          <p class="fix"><strong>O que fazer:</strong> o anúncio diz que o kit aceita MG90S, com engrenagem de metal. Se o ombro sofrer, troque só ele (R$ 21–39). Compre o de <strong>180°</strong>, não o de 360°.</p>
+        </div>
+      </div>
+      <div class="critica">
+        <span class="chip info">Atenção</span>
+        <div>
+          <h3>Os pinos do manual podem ser outros</h3>
+          <p>Eu ainda não vi o manual. Este guia usa D3, D5, D6, D9 para os servos e A0–A3 para os joysticks. Se o manual usar outros, siga o manual e mude os números no topo do código: é só isso.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="funciona">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">VISÃO GERAL</span>
+      <h2>Como o sistema funciona</h2>
+      <p>Os joysticks dizem para que lado e com que força você quer mexer. O Uno transforma isso em velocidade de cada junta, 50 vezes por segundo, e manda os servos andarem.</p>
+    </div>
+    <div class="fios">
+      <span><i style="background:var(--w-pos)"></i>+5 V</span>
+      <span><i style="background:var(--w-gnd)"></i>GND</span>
+      <span><i style="background:var(--w-sig)"></i>sinal dos servos</span>
+      <span><i style="background:var(--w-out)"></i>sinal dos joysticks</span>
+    </div>
+    <figure class="dg">
+      <p class="dica-scroll">arraste para os lados para ver o diagrama inteiro →</p>
+      <div class="scroll">
+      <svg viewBox="0 0 980 340" role="img" aria-labelledby="fa-t">
+        <title id="fa-t">Joysticks ligados ao Arduino Uno com shield V5, que comanda os quatro servos; a fonte de 5 V entra no borne da shield e o Uno é alimentado pela USB</title>
+        <rect class="d-box" x="400" y="16" width="180" height="48" rx="24"/>
+        <text class="d-l" x="490" y="45" text-anchor="middle">USB · alimenta só o Uno</text>
+        <path class="d-w c-ink" d="M490,64 V108"/>
+        <rect class="d-box" x="20" y="110" width="220" height="110" rx="10"/>
+        <text class="d-t" x="40" y="146">2 JOYSTICKS</text>
+        <text class="d-s" x="40" y="170">eixos X e Y de cada um</text>
+        <text class="d-s" x="40" y="190">+ botão de clique</text>
+        <rect class="d-box" x="385" y="110" width="210" height="110" rx="10"/>
+        <text class="d-t" x="405" y="146">UNO + SHIELD V5</text>
+        <text class="d-s" x="405" y="170">lê, calcula, grava</text>
+        <text class="d-s" x="405" y="190">e comanda os servos</text>
+        <rect class="d-box" x="750" y="110" width="210" height="110" rx="10"/>
+        <text class="d-t" x="770" y="146">4 SERVOS SG90</text>
+        <text class="d-s" x="770" y="170">base, ombro,</text>
+        <text class="d-s" x="770" y="190">cotovelo, garra</text>
+        <text class="d-lb" x="312" y="132" text-anchor="middle">6 sinais</text>
+        <path class="d-w c-out" d="M242,160 H378" marker-end="url(#ah-out)"/>
+        <text class="d-l" x="312" y="190" text-anchor="middle">4 eixos + 2 cliques</text>
+        <text class="d-lb" x="672" y="132" text-anchor="middle">cabo do servo</text>
+        <path class="d-w c-sig" d="M597,152 H742" marker-end="url(#ah-sig)"/>
+        <path class="d-w c-pos" d="M597,168 H748"/>
+        <path class="d-w c-gnd" d="M597,184 H748"/>
+        <text class="d-l" x="672" y="208" text-anchor="middle">sinal + 5 V + GND</text>
+        <rect class="d-box" x="750" y="266" width="210" height="58" rx="10"/>
+        <text class="d-t" x="770" y="290">FONTE 5 V 2 A</text>
+        <text class="d-s" x="770" y="310">do kit</text>
+        <path class="d-w c-pos" d="M750,286 H540 V222"/>
+        <path class="d-w c-gnd" d="M750,306 H510 V222"/>
+        <text class="d-lb" x="645" y="278" text-anchor="middle">borne azul da shield</text>
+        <text class="d-l" x="645" y="330" text-anchor="middle">jumper SEL fora</text>
+      </svg>
+      </div>
+      <figcaption><strong>Duas fontes, um GND.</strong> A USB alimenta só o Uno. A fonte de 5 V entra no borne da shield e alimenta só os servos, com o jumper SEL tirado. O GND das duas é o mesmo dentro da shield, então não precisa de fio extra.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="energia">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">ENERGIA</span>
+      <h2>Como ligar a fonte sem queimar nada</h2>
+      <p>O jumper SEL decide de onde vem a energia das fileiras de servo da shield. Com ele colocado, os servos puxam corrente do Uno. Sem ele, puxam do borne azul.</p>
+    </div>
+    <div class="duas">
+      <div class="painel">
+        <h3>Passo a passo</h3>
+        <ol class="list">
+          <li>Com tudo desligado, <strong>tire o jumper SEL</strong> da shield (fica perto do borne azul). Guarde-o.</li>
+          <li>Ligue a fonte de 5 V no <strong>borne P4 fêmea</strong> do kit. Ele tem dois parafusos: + e −.</li>
+          <li>Leve dois fios do borne P4 até o <strong>borne azul</strong> da shield: + no +, − no −. Confira com o multímetro: ~5 V, com o vermelho no +.</li>
+          <li>Ligue o Uno na <strong>USB</strong> (notebook ou carregador de celular).</li>
+          <li>Ligue a fonte por último.</li>
+        </ol>
+        <p class="small">Cada shield “V5” é um pouco diferente. Se a sua não tiver jumper SEL, ou se o manual mandar outro jeito, siga o manual e confira com o multímetro antes de ligar os servos.</p>
+      </div>
+      <div class="painel">
+        <h3>O que nunca fazer</h3>
+        <ul class="list">
+          <li><strong>Fonte de 5 V no conector P4 do Uno.</strong> Ali ele precisa de uns 7 V ou mais. Com 5 V, o Uno fica com tensão baixa e instável.</li>
+          <li><strong>Deixar o jumper SEL e ligar a fonte no borne.</strong> As duas fontes ficam ligadas juntas no 5 V do Uno.</li>
+          <li><strong>Usar uma fonte de mais de 6 V</strong> nos servos. O SG90 aguenta de 4,8 a 6 V.</li>
+          <li><strong>Inverter + e −</strong> no borne. Queima servos na hora.</li>
+          <li><strong>Alimentar os 4 servos só pela USB.</strong> A USB entrega uns 500 mA, e os servos podem pedir mais de 2 A.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>O que puxa corrente</th><th class="num">Por servo</th><th class="num">4 servos</th></tr></thead>
+        <tbody>
+          <tr><td>SG90 parado, segurando a posição</td><td class="num">5–10 mA</td><td class="num">≈ 40 mA</td></tr>
+          <tr><td>SG90 se movendo sem carga</td><td class="num">100–250 mA</td><td class="num">0,4–1 A</td></tr>
+          <tr><td>SG90 travado (forçando)</td><td class="num">360–750 mA</td><td class="num">até ≈ 3 A</td></tr>
+          <tr><td colspan="3"><strong>Fonte do kit: 2 A.</strong> Sobra folga no uso normal, mas não se tudo travar junto. Por isso o código limita a velocidade e os ângulos.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="ligacoes">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">LIGAÇÕES</span>
+      <h2>Onde vai cada fio</h2>
+      <p>A shield V5 tem, para cada pino, uma fileira de três: <strong>S</strong> (sinal), <strong>V</strong> (+5 V) e <strong>G</strong> (GND). O cabo do servo encaixa direto: laranja no S, vermelho no V, marrom no G.</p>
+    </div>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Peça</th><th>Fio</th><th>Pino na shield</th><th>No código</th></tr></thead>
+        <tbody>
+          <tr><td>Servo da base</td><td>cabo do servo</td><td><code>D3</code></td><td><code>PINO_SERVO[0]</code></td></tr>
+          <tr><td>Servo do ombro</td><td>cabo do servo</td><td><code>D5</code></td><td><code>PINO_SERVO[1]</code></td></tr>
+          <tr><td>Servo do cotovelo</td><td>cabo do servo</td><td><code>D6</code></td><td><code>PINO_SERVO[2]</code></td></tr>
+          <tr><td>Servo da garra</td><td>cabo extensor + servo</td><td><code>D9</code></td><td><code>PINO_SERVO[3]</code></td></tr>
+          <tr><td>Joystick 1</td><td>VRx · VRy · SW</td><td><code>A0</code> · <code>A1</code> · <code>D2</code></td><td>base · ombro · gravar</td></tr>
+          <tr><td>Joystick 2</td><td>VRx · VRy · SW</td><td><code>A2</code> · <code>A3</code> · <code>D4</code></td><td>garra · cotovelo · repetir</td></tr>
+          <tr><td>Os dois joysticks</td><td>+5V · GND</td><td>V · G de qualquer fileira analógica</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="aviso cuidado">
+      <span class="rot">Se o manual usar outros pinos</span>
+      <p>Ligue como o manual manda e troque os números no topo do <code>braco_robotico</code>: <code>PINO_SERVO</code>, <code>PINO_EIXO</code>, <code>PINO_BOTAO_GRAVAR</code> e <code>PINO_BOTAO_TOCAR</code>. Se uma junta andar ao contrário do joystick, troque o <code>false</code> dela por <code>true</code> em <code>INVERTER</code>.</p>
+    </div>
+    <figure class="dg">
+      <p class="dica-scroll">arraste para os lados para ver o diagrama inteiro →</p>
+      <div class="scroll">
+      <svg viewBox="0 0 900 300" role="img" aria-labelledby="jc-t">
+        <title id="jc-t">O que cada joystick faz: joystick 1 gira a base, levanta o ombro e grava; joystick 2 abre a garra, dobra o cotovelo e repete</title>
+        <text class="d-t" x="200" y="28" text-anchor="middle">JOYSTICK 1</text>
+        <circle cx="200" cy="150" r="84" class="d-box"/>
+        <circle cx="200" cy="150" r="32" class="d-part"/>
+        <path class="d-thin" style="stroke-width:2.4" d="M152,150 H96" marker-end="url(#ah-ink)"/>
+        <path class="d-thin" style="stroke-width:2.4" d="M248,150 H304" marker-end="url(#ah-ink)"/>
+        <path class="d-thin" style="stroke-width:2.4" d="M200,102 V60" marker-end="url(#ah-ink)"/>
+        <path class="d-thin" style="stroke-width:2.4" d="M200,198 V240" marker-end="url(#ah-ink)"/>
+        <text class="d-lb" x="70" y="154" text-anchor="end">base</text>
+        <text class="d-lb" x="330" y="154">base</text>
+        <text class="d-lb" x="214" y="70">ombro</text>
+        <text class="d-lb" x="214" y="236">ombro</text>
+        <text class="d-l" x="200" y="282" text-anchor="middle">clique: GRAVA · segurar 2 s: apaga tudo</text>
+        <text class="d-t" x="650" y="28" text-anchor="middle">JOYSTICK 2</text>
+        <circle cx="650" cy="150" r="84" class="d-box"/>
+        <circle cx="650" cy="150" r="32" class="d-part"/>
+        <path class="d-thin" style="stroke-width:2.4" d="M602,150 H546" marker-end="url(#ah-ink)"/>
+        <path class="d-thin" style="stroke-width:2.4" d="M698,150 H754" marker-end="url(#ah-ink)"/>
+        <path class="d-thin" style="stroke-width:2.4" d="M650,102 V60" marker-end="url(#ah-ink)"/>
+        <path class="d-thin" style="stroke-width:2.4" d="M650,198 V240" marker-end="url(#ah-ink)"/>
+        <text class="d-lb" x="520" y="154" text-anchor="end">garra</text>
+        <text class="d-lb" x="780" y="154">garra</text>
+        <text class="d-lb" x="664" y="70">cotovelo</text>
+        <text class="d-lb" x="664" y="236">cotovelo</text>
+        <text class="d-l" x="650" y="282" text-anchor="middle">clique: REPETE / PARA · segurar 2 s: posição inicial</text>
+      </svg>
+      </div>
+      <figcaption><strong>Controle por velocidade.</strong> Quanto mais você inclina o joystick, mais rápido a junta anda. Soltou, ela para onde está. É mais fácil de controlar que o joystick “copiando” a posição, e o braço não cai quando você solta.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="codigo">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">CÓDIGO</span>
+      <h2>O programa do braço</h2>
+      <p>Um programa só, <code>braco_robotico</code>, sem bibliotecas para instalar: só <code>Servo.h</code> e <code>EEPROM.h</code>, que já vêm com a Arduino IDE. Ele compila no Uno com 27 % da memória e passou em testes de lógica no computador.</p>
+    </div>
+    <div class="duas">
+      <div class="painel">
+        <h3>O que ele faz, 50 vezes por segundo</h3>
+        <ol class="list">
+          <li><strong>Ao ligar,</strong> mede o centro de cada joystick (não toque neles por 1 s) e liga os servos um de cada vez, para não dar pico de corrente.</li>
+          <li><strong>Lê os joysticks</strong> e ignora pequenos desvios do centro (<code>ZONA_MORTA</code>), para o braço não andar sozinho.</li>
+          <li><strong>Converte em velocidade</strong> de cada junta, até <code>VEL_MAX</code> graus por segundo.</li>
+          <li><strong>Respeita os limites</strong> <code>ANG_MIN</code> e <code>ANG_MAX</code> de cada junta, para nenhuma bater nas peças.</li>
+          <li><strong>Grava, repete e guarda</strong> as posições na EEPROM, que não apaga ao desligar.</li>
+        </ol>
+      </div>
+      <div class="painel">
+        <h3>Como achar os limites de cada junta</h3>
+        <ol class="list">
+          <li>Grave o programa e abra o Monitor Serial em 115200.</li>
+          <li>Mova <strong>uma junta por vez, devagar</strong>, até o fim. A linha mostra o ângulo de cada junta.</li>
+          <li>Anote o ângulo em que ela começa a forçar, bater ou zumbir, nos dois sentidos.</li>
+          <li>Coloque os valores em <code>ANG_MIN</code> e <code>ANG_MAX</code>, com 5° de folga, e grave de novo.</li>
+          <li>Na garra: fechada <strong>sem apertar</strong> é o limite. Garra forçando gasta energia e esquenta o servo.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Ajuste no código</th><th>Padrão</th><th>Quando mexer</th></tr></thead>
+        <tbody>
+          <tr><td><code>ANG_MIN</code> / <code>ANG_MAX</code></td><td>por junta</td><td><strong>Sempre.</strong> Pelos limites que você medir.</td></tr>
+          <tr><td><code>ANG_INICIAL</code></td><td class="num">90°</td><td>A posição de “descanso” do braço ao ligar.</td></tr>
+          <tr><td><code>INVERTER</code></td><td>false</td><td>Junta andando ao contrário do joystick.</td></tr>
+          <tr><td><code>VEL_MAX</code></td><td class="num">70–120 °/s</td><td>Braço rápido demais para controlar: diminua.</td></tr>
+          <tr><td><code>VEL_REPETIR</code></td><td class="num">60 °/s</td><td>Velocidade ao repetir. Diminua se a fonte não aguentar.</td></tr>
+          <tr><td><code>PAUSA_POSICAO_MS</code></td><td class="num">400 ms</td><td>Quanto ele para em cada posição gravada.</td></tr>
+          <tr><td><code>ZONA_MORTA</code></td><td class="num">70</td><td>Aumente se uma junta andar sozinha com o joystick solto.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="codigo"><header><div><div class="nome">braco_robotico/braco_robotico.ino</div><div class="placa">Arduino Uno + Shield V5 · 369 linhas</div></div><button type="button">Copiar código</button></header><p class="desc">Controle por velocidade nos joysticks, limites por junta, gravar e repetir até 40 posições na EEPROM.</p><pre><code><span class="cm">/*
+  ==========================================================================
+  BRACO ROBOTICO (Mark 2) - joysticks + GRAVAR E REPETIR  -  Arduino Uno
+  ==========================================================================
+  O que faz:
+    - Voce move o braco com os 2 joysticks. Quanto mais inclina, mais rapido
+      a junta anda; soltou, ela PARA onde esta (controle por velocidade).
+    - Clique no joystick 1 = GRAVA a posicao atual (ate 40 posicoes).
+    - Clique no joystick 2 = o braco REPETE sozinho as posicoes gravadas,
+      em loop. Clique de novo (ou mexa um joystick) para parar.
+    - A gravacao fica na memoria (EEPROM): sobrevive a desligar o Uno.
+
+  Comandos nos botoes dos joysticks:
+    Joystick 1, clique ............ grava a posicao atual
+    Joystick 1, segurar 2 s ....... APAGA todas as posicoes gravadas
+    Joystick 2, clique ............ repete / para
+    Joystick 2, segurar 2 s ....... volta para a posicao inicial
+    (No Monitor Serial, 115200: g grava, r repete/para, l apaga,
+     i posicao inicial, p lista as posicoes, ? ajuda.)
+
+  Ligacoes (CONFIRA COM O MANUAL DO KIT; se for diferente, mude os numeros
+  em "Pinos" logo abaixo):
+    Servos na shield V5 (fileira S-V-G de cada pino):
+      base = D3 | ombro = D5 | cotovelo = D6 | garra = D9
+    Joystick 1: VRx -&gt; A0 (base)     VRy -&gt; A1 (ombro)     SW -&gt; D2
+    Joystick 2: VRx -&gt; A2 (garra)    VRy -&gt; A3 (cotovelo)  SW -&gt; D4
+    Joysticks: +5V -&gt; V, GND -&gt; G da shield.
+
+  ENERGIA (importante):
+    Fonte 5 V 2 A do kit -&gt; borne azul da shield (use o borne P4 femea).
+    TIRE o jumper "SEL" da shield: assim os servos usam so a fonte.
+    O Uno fica na USB (notebook ou carregador de celular).
+    NUNCA ligue a fonte de 5 V no conector P4 do proprio Uno: ali ele
+    precisa de uns 7 V ou mais.
+
+  Ao ligar: NAO toque nos joysticks por 1 segundo (o programa mede o centro
+  de cada um). Depois os servos ligam um de cada vez.
+  ==========================================================================
+*/</span>
+
+<span class="pp">#include &lt;Servo.h&gt;</span>
+<span class="pp">#include &lt;EEPROM.h&gt;</span>
+
+<span class="cm">// ---------------- Pinos (ordem: base, ombro, cotovelo, garra) ----------------</span>
+<span class="kw">const</span> <span class="kw">uint8_t</span> PINO_SERVO[4]    = { 3, 5, 6, 9 };
+<span class="kw">const</span> <span class="kw">uint8_t</span> PINO_EIXO[4]     = { A0, A1, A3, A2 };   <span class="cm">// qual eixo mexe cada junta</span>
+<span class="kw">const</span> <span class="kw">char</span>*   NOME_JUNTA[4]    = { <span class="st">"base"</span>, <span class="st">"ombro"</span>, <span class="st">"cotovelo"</span>, <span class="st">"garra"</span> };
+<span class="kw">const</span> <span class="kw">uint8_t</span> PINO_BOTAO_GRAVAR = 2;   <span class="cm">// SW do joystick 1</span>
+<span class="kw">const</span> <span class="kw">uint8_t</span> PINO_BOTAO_TOCAR  = 4;   <span class="cm">// SW do joystick 2</span>
+<span class="kw">const</span> <span class="kw">uint8_t</span> PINO_LED = 13;
+
+<span class="cm">// Se uma junta anda para o lado contrario do joystick, troque false por true.</span>
+<span class="kw">const</span> <span class="kw">bool</span> INVERTER[4] = { <span class="kw">false</span>, <span class="kw">false</span>, <span class="kw">false</span>, <span class="kw">false</span> };
+
+<span class="cm">// ---------------- Limites de cada junta (em graus, 0 a 180) ----------------</span>
+<span class="cm">// Mexa a junta devagar com o joystick e veja o angulo no Monitor Serial.</span>
+<span class="cm">// Anote onde ela comeca a forcar ou bater e coloque aqui, com 5 graus de folga.</span>
+<span class="cm">// Isso protege o servo e as pecas impressas.</span>
+<span class="kw">int</span> ANG_MIN[4]     = {  10,  30,  30,  60 };
+<span class="kw">int</span> ANG_MAX[4]     = { 170, 150, 150, 120 };
+<span class="kw">int</span> ANG_INICIAL[4] = {  90,  90,  90,  90 };
+
+<span class="cm">// ---------------- Ajustes finos ----------------</span>
+<span class="kw">const</span> <span class="kw">unsigned</span> <span class="kw">long</span> PERIODO_MS = 20;       <span class="cm">// 50 vezes por segundo</span>
+<span class="kw">const</span> <span class="kw">int</span>   ZONA_MORTA = 70;               <span class="cm">// folga do joystick em torno do centro (0..512)</span>
+<span class="kw">const</span> <span class="kw">float</span> VEL_MAX[4] = { 90, 70, 70, 120 }; <span class="cm">// graus por segundo com o joystick no fim</span>
+<span class="kw">const</span> <span class="kw">float</span> VEL_REPETIR = 60;              <span class="cm">// graus por segundo ao repetir</span>
+<span class="kw">const</span> <span class="kw">unsigned</span> <span class="kw">long</span> PAUSA_POSICAO_MS = 400; <span class="cm">// parada em cada posicao gravada</span>
+<span class="kw">const</span> <span class="kw">unsigned</span> <span class="kw">long</span> APERTO_LONGO_MS = 2000;
+<span class="kw">const</span> <span class="kw">uint8_t</span> MAX_POSICOES = 40;
+
+<span class="cm">// ---------------- Gravacao na EEPROM ----------------</span>
+<span class="cm">// Endereco 0: assinatura (2 bytes) e quantidade (1 byte). Depois, 4 bytes por posicao.</span>
+<span class="kw">const</span> <span class="kw">uint16_t</span> ASSINATURA = 0x4252;        <span class="cm">// "BR"</span>
+<span class="kw">uint8_t</span> posicoes[MAX_POSICOES][4];
+<span class="kw">uint8_t</span> numPosicoes = 0;
+
+<span class="cm">// ---------------- Variaveis ----------------</span>
+Servo servo[4];
+<span class="kw">float</span> angulo[4];          <span class="cm">// angulo atual (com casas decimais, para andar suave)</span>
+<span class="kw">int</span>   anguloEscrito[4];   <span class="cm">// ultimo valor enviado ao servo</span>
+<span class="kw">int</span>   centro[4];          <span class="cm">// leitura do joystick parado</span>
+
+<span class="kw">bool</span>  repetindo = <span class="kw">false</span>;
+<span class="kw">uint8_t</span> alvoAtual = 0;
+<span class="kw">bool</span>  esperando = <span class="kw">false</span>;
+<span class="kw">unsigned</span> <span class="kw">long</span> inicioEspera = 0;
+
+<span class="kw">bool</span>  indoParaInicio = <span class="kw">false</span>;
+
+<span class="kw">struct</span> Botao {
+  <span class="kw">uint8_t</span> pino;
+  <span class="kw">bool</span> antes;
+  <span class="kw">unsigned</span> <span class="kw">long</span> inicio;
+  <span class="kw">bool</span> longoFeito;
+};
+Botao botaoGravar = { PINO_BOTAO_GRAVAR, <span class="kw">false</span>, 0, <span class="kw">true</span> };
+Botao botaoTocar  = { PINO_BOTAO_TOCAR,  <span class="kw">false</span>, 0, <span class="kw">true</span> };
+
+<span class="kw">unsigned</span> <span class="kw">long</span> proximoCiclo = 0;
+<span class="kw">unsigned</span> <span class="kw">long</span> proximoPrint = 0;
+
+<span class="cm">// ======================= EEPROM =======================</span>
+
+<span class="kw">void</span> salvarPosicoes() {
+  EEPROM.put(0, ASSINATURA);
+  EEPROM.update(2, numPosicoes);
+  <span class="kw">for</span> (<span class="kw">uint8_t</span> p = 0; p &lt; numPosicoes; p++)
+    <span class="kw">for</span> (<span class="kw">uint8_t</span> j = 0; j &lt; 4; j++) EEPROM.update(3 + p * 4 + j, posicoes[p][j]);
+}
+
+<span class="kw">void</span> carregarPosicoes() {
+  <span class="kw">uint16_t</span> a;
+  EEPROM.get(0, a);
+  <span class="kw">uint8_t</span> n = EEPROM.read(2);
+  <span class="kw">if</span> (a != ASSINATURA || n &gt; MAX_POSICOES) { numPosicoes = 0; <span class="kw">return</span>; }
+  numPosicoes = n;
+  <span class="kw">for</span> (<span class="kw">uint8_t</span> p = 0; p &lt; numPosicoes; p++)
+    <span class="kw">for</span> (<span class="kw">uint8_t</span> j = 0; j &lt; 4; j++) posicoes[p][j] = EEPROM.read(3 + p * 4 + j);
+}
+
+<span class="cm">// ======================= SERVOS =======================</span>
+
+<span class="kw">void</span> escreverServo(<span class="kw">uint8_t</span> j) {
+  <span class="kw">int</span> a = (<span class="kw">int</span>)(angulo[j] + 0.5);
+  <span class="kw">if</span> (a != anguloEscrito[j]) {
+    servo[j].write(a);
+    anguloEscrito[j] = a;
+  }
+}
+
+<span class="cm">// Leva a junta j ate o alvo, no maximo "passo" graus neste ciclo.</span>
+<span class="cm">// Devolve true quando chegou.</span>
+<span class="kw">bool</span> andarAte(<span class="kw">uint8_t</span> j, <span class="kw">float</span> alvo, <span class="kw">float</span> passo) {
+  <span class="kw">float</span> falta = alvo - angulo[j];
+  <span class="kw">if</span> (falta &gt; passo) angulo[j] += passo;
+  <span class="kw">else</span> <span class="kw">if</span> (falta &lt; -passo) angulo[j] -= passo;
+  <span class="kw">else</span> angulo[j] = alvo;
+  escreverServo(j);
+  <span class="kw">return</span> angulo[j] == alvo;
+}
+
+<span class="cm">// ======================= JOYSTICKS =======================</span>
+
+<span class="cm">// Velocidade pedida pelo joystick da junta j, em graus por segundo.</span>
+<span class="kw">float</span> velocidadeJoystick(<span class="kw">uint8_t</span> j) {
+  <span class="kw">int</span> desvio = analogRead(PINO_EIXO[j]) - centro[j];
+  <span class="kw">if</span> (INVERTER[j]) desvio = -desvio;
+  <span class="kw">if</span> (abs(desvio) &lt; ZONA_MORTA) <span class="kw">return</span> 0;
+  <span class="cm">// de ZONA_MORTA ate 512 -&gt; de 0 ate VEL_MAX (com o sinal da direcao)</span>
+  <span class="kw">float</span> fracao = (<span class="kw">float</span>)(abs(desvio) - ZONA_MORTA) / (512 - ZONA_MORTA);
+  <span class="kw">if</span> (fracao &gt; 1) fracao = 1;
+  <span class="kw">return</span> (desvio &gt; 0 ? 1 : -1) * fracao * VEL_MAX[j];
+}
+
+<span class="kw">bool</span> algumJoystickMexido() {
+  <span class="kw">for</span> (<span class="kw">uint8_t</span> j = 0; j &lt; 4; j++) <span class="kw">if</span> (velocidadeJoystick(j) != 0) <span class="kw">return</span> <span class="kw">true</span>;
+  <span class="kw">return</span> <span class="kw">false</span>;
+}
+
+<span class="kw">void</span> medirCentros() {
+  <span class="kw">for</span> (<span class="kw">uint8_t</span> j = 0; j &lt; 4; j++) {
+    <span class="kw">long</span> soma = 0;
+    <span class="kw">for</span> (<span class="kw">uint8_t</span> k = 0; k &lt; 32; k++) { soma += analogRead(PINO_EIXO[j]); delay(2); }
+    centro[j] = soma / 32;
+    <span class="kw">if</span> (abs(centro[j] - 512) &gt; 150) {
+      Serial.print(F(<span class="st">"!! Joystick da junta "</span>));
+      Serial.print(NOME_JUNTA[j]);
+      Serial.print(F(<span class="st">" fora do centro (leitura "</span>));
+      Serial.print(centro[j]);
+      Serial.println(F(<span class="st">"). Fio solto ou alguem mexeu ao ligar?"</span>));
+    }
+  }
+}
+
+<span class="cm">// ======================= ACOES =======================</span>
+
+<span class="kw">void</span> piscar(<span class="kw">uint8_t</span> vezes) {
+  <span class="kw">for</span> (<span class="kw">uint8_t</span> k = 0; k &lt; vezes; k++) {
+    digitalWrite(PINO_LED, <span class="kw">HIGH</span>); delay(60);
+    digitalWrite(PINO_LED, <span class="kw">LOW</span>);  delay(60);
+  }
+}
+
+<span class="kw">void</span> gravarPosicao() {
+  <span class="kw">if</span> (repetindo) <span class="kw">return</span>;
+  <span class="kw">if</span> (numPosicoes &gt;= MAX_POSICOES) {
+    Serial.println(F(<span class="st">"Memoria cheia (40 posicoes). Segure o joystick 1 por 2 s para apagar."</span>));
+    piscar(5);
+    <span class="kw">return</span>;
+  }
+  <span class="kw">for</span> (<span class="kw">uint8_t</span> j = 0; j &lt; 4; j++) posicoes[numPosicoes][j] = anguloEscrito[j];
+  numPosicoes++;
+  salvarPosicoes();
+  Serial.print(F(<span class="st">"Gravada a posicao "</span>));
+  Serial.println(numPosicoes);
+  piscar(1);
+}
+
+<span class="kw">void</span> apagarPosicoes() {
+  repetindo = <span class="kw">false</span>;
+  numPosicoes = 0;
+  salvarPosicoes();
+  Serial.println(F(<span class="st">"Todas as posicoes foram apagadas."</span>));
+  piscar(3);
+}
+
+<span class="kw">void</span> alternarRepeticao() {
+  <span class="kw">if</span> (repetindo) {
+    repetindo = <span class="kw">false</span>;
+    Serial.println(F(<span class="st">"&gt;&gt; Repeticao parada."</span>));
+    <span class="kw">return</span>;
+  }
+  <span class="kw">if</span> (numPosicoes &lt; 2) {
+    Serial.println(F(<span class="st">"Grave pelo menos 2 posicoes (clique no joystick 1) antes de repetir."</span>));
+    piscar(2);
+    <span class="kw">return</span>;
+  }
+  repetindo = <span class="kw">true</span>;
+  indoParaInicio = <span class="kw">false</span>;
+  alvoAtual = 0;
+  esperando = <span class="kw">false</span>;
+  Serial.println(F(<span class="st">"&gt;&gt; Repetindo as posicoes gravadas..."</span>));
+}
+
+<span class="kw">void</span> irParaInicio() {
+  repetindo = <span class="kw">false</span>;
+  indoParaInicio = <span class="kw">true</span>;
+  Serial.println(F(<span class="st">"&gt;&gt; Voltando para a posicao inicial."</span>));
+}
+
+<span class="kw">void</span> listarPosicoes() {
+  Serial.print(numPosicoes);
+  Serial.println(F(<span class="st">" posicoes gravadas (base, ombro, cotovelo, garra):"</span>));
+  <span class="kw">for</span> (<span class="kw">uint8_t</span> p = 0; p &lt; numPosicoes; p++) {
+    Serial.print(F(<span class="st">"  "</span>));
+    Serial.print(p + 1);
+    Serial.print(F(<span class="st">": "</span>));
+    <span class="kw">for</span> (<span class="kw">uint8_t</span> j = 0; j &lt; 4; j++) { Serial.print(posicoes[p][j]); Serial.print(j &lt; 3 ? <span class="st">' '</span> : <span class="st">'\n'</span>); }
+  }
+}
+
+<span class="kw">void</span> mostrarAjuda() {
+  Serial.println(F(<span class="st">"Joystick 1: clique = grava | segurar 2 s = apaga tudo"</span>));
+  Serial.println(F(<span class="st">"Joystick 2: clique = repete/para | segurar 2 s = posicao inicial"</span>));
+  Serial.println(F(<span class="st">"Monitor: g grava, r repete/para, l apaga, i inicial, p lista, ? ajuda"</span>));
+}
+
+<span class="cm">// Le um botao (INPUT_PULLUP: apertado = LOW). Devolve 1 = clique, 2 = aperto longo.</span>
+<span class="kw">uint8_t</span> lerBotao(Botao&amp; b) {
+  <span class="kw">bool</span> apertado = (digitalRead(b.pino) == <span class="kw">LOW</span>);
+  <span class="kw">unsigned</span> <span class="kw">long</span> agora = millis();
+  <span class="kw">uint8_t</span> evento = 0;
+  <span class="kw">if</span> (apertado &amp;&amp; !b.antes) { b.inicio = agora; b.longoFeito = <span class="kw">false</span>; }
+  <span class="kw">if</span> (apertado &amp;&amp; !b.longoFeito &amp;&amp; agora - b.inicio &gt;= APERTO_LONGO_MS) {
+    b.longoFeito = <span class="kw">true</span>;
+    evento = 2;
+  }
+  <span class="kw">if</span> (!apertado &amp;&amp; b.antes &amp;&amp; !b.longoFeito &amp;&amp; agora - b.inicio &gt;= 40) evento = 1;  <span class="cm">// 40 ms ignora ruido</span>
+  b.antes = apertado;
+  <span class="kw">return</span> evento;
+}
+
+<span class="kw">void</span> lerComandos() {
+  <span class="kw">while</span> (Serial.available() &gt; 0) {
+    <span class="kw">char</span> c = Serial.read();
+    <span class="kw">if</span> (c == <span class="st">'g'</span> || c == <span class="st">'G'</span>) gravarPosicao();
+    <span class="kw">else</span> <span class="kw">if</span> (c == <span class="st">'r'</span> || c == <span class="st">'R'</span>) alternarRepeticao();
+    <span class="kw">else</span> <span class="kw">if</span> (c == <span class="st">'l'</span> || c == <span class="st">'L'</span>) apagarPosicoes();
+    <span class="kw">else</span> <span class="kw">if</span> (c == <span class="st">'i'</span> || c == <span class="st">'I'</span>) irParaInicio();
+    <span class="kw">else</span> <span class="kw">if</span> (c == <span class="st">'p'</span> || c == <span class="st">'P'</span>) listarPosicoes();
+    <span class="kw">else</span> <span class="kw">if</span> (c == <span class="st">'?'</span>) mostrarAjuda();
+  }
+}
+
+<span class="cm">// ======================= SETUP E LOOP =======================</span>
+
+<span class="kw">void</span> setup() {
+  Serial.begin(115200);
+  pinMode(PINO_LED, <span class="kw">OUTPUT</span>);
+  pinMode(PINO_BOTAO_GRAVAR, <span class="kw">INPUT_PULLUP</span>);
+  pinMode(PINO_BOTAO_TOCAR, <span class="kw">INPUT_PULLUP</span>);
+  Serial.println(F(<span class="st">"\n=== Braco Robotico - joysticks + gravar e repetir ==="</span>));
+  Serial.println(F(<span class="st">"Nao toque nos joysticks..."</span>));
+  delay(1000);
+  medirCentros();
+
+  <span class="cm">// Liga os servos UM DE CADA VEZ, ja na posicao inicial (write antes de attach).</span>
+  <span class="kw">for</span> (<span class="kw">uint8_t</span> j = 0; j &lt; 4; j++) {
+    angulo[j] = constrain(ANG_INICIAL[j], ANG_MIN[j], ANG_MAX[j]);
+    anguloEscrito[j] = (<span class="kw">int</span>)angulo[j];
+    servo[j].write(anguloEscrito[j]);
+    servo[j].attach(PINO_SERVO[j]);
+    delay(300);
+  }
+
+  carregarPosicoes();
+  Serial.print(numPosicoes);
+  Serial.println(F(<span class="st">" posicoes gravadas na memoria."</span>));
+  mostrarAjuda();
+  proximoCiclo = millis();
+}
+
+<span class="kw">void</span> loop() {
+  lerComandos();
+  <span class="kw">uint8_t</span> eg = lerBotao(botaoGravar);
+  <span class="kw">uint8_t</span> et = lerBotao(botaoTocar);
+  <span class="kw">if</span> (eg == 1) gravarPosicao();
+  <span class="kw">if</span> (eg == 2) apagarPosicoes();
+  <span class="kw">if</span> (et == 1) alternarRepeticao();
+  <span class="kw">if</span> (et == 2) irParaInicio();
+
+  <span class="kw">if</span> ((<span class="kw">long</span>)(millis() - proximoCiclo) &lt; 0) <span class="kw">return</span>;
+  proximoCiclo += PERIODO_MS;
+  <span class="kw">const</span> <span class="kw">float</span> dt = PERIODO_MS / 1000.0;
+
+  <span class="cm">// Mexer um joystick sempre tem prioridade: para a repeticao (seguranca).</span>
+  <span class="kw">if</span> ((repetindo || indoParaInicio) &amp;&amp; algumJoystickMexido()) {
+    repetindo = <span class="kw">false</span>;
+    indoParaInicio = <span class="kw">false</span>;
+    Serial.println(F(<span class="st">"&gt;&gt; Joystick mexido: parei."</span>));
+  }
+
+  <span class="kw">if</span> (repetindo) {
+    digitalWrite(PINO_LED, (millis() / 250) % 2);   <span class="cm">// pisca = repetindo</span>
+    <span class="kw">if</span> (esperando) {
+      <span class="kw">if</span> (millis() - inicioEspera &gt;= PAUSA_POSICAO_MS) {
+        esperando = <span class="kw">false</span>;
+        alvoAtual = (alvoAtual + 1) % numPosicoes;
+      }
+    } <span class="kw">else</span> {
+      <span class="kw">bool</span> chegou = <span class="kw">true</span>;
+      <span class="kw">for</span> (<span class="kw">uint8_t</span> j = 0; j &lt; 4; j++) {
+        <span class="kw">float</span> alvo = constrain(posicoes[alvoAtual][j], ANG_MIN[j], ANG_MAX[j]);
+        <span class="kw">if</span> (!andarAte(j, alvo, VEL_REPETIR * dt)) chegou = <span class="kw">false</span>;
+      }
+      <span class="kw">if</span> (chegou) { esperando = <span class="kw">true</span>; inicioEspera = millis(); }
+    }
+  } <span class="kw">else</span> <span class="kw">if</span> (indoParaInicio) {
+    digitalWrite(PINO_LED, <span class="kw">LOW</span>);
+    <span class="kw">bool</span> chegou = <span class="kw">true</span>;
+    <span class="kw">for</span> (<span class="kw">uint8_t</span> j = 0; j &lt; 4; j++) {
+      <span class="kw">float</span> alvo = constrain(ANG_INICIAL[j], ANG_MIN[j], ANG_MAX[j]);
+      <span class="kw">if</span> (!andarAte(j, alvo, VEL_REPETIR * dt)) chegou = <span class="kw">false</span>;
+    }
+    <span class="kw">if</span> (chegou) indoParaInicio = <span class="kw">false</span>;
+  } <span class="kw">else</span> {
+    digitalWrite(PINO_LED, <span class="kw">LOW</span>);
+    <span class="kw">for</span> (<span class="kw">uint8_t</span> j = 0; j &lt; 4; j++) {
+      angulo[j] += velocidadeJoystick(j) * dt;
+      angulo[j] = constrain(angulo[j], ANG_MIN[j], ANG_MAX[j]);
+      escreverServo(j);
+    }
+  }
+
+  <span class="cm">// Mostra os angulos 4 vezes por segundo (use para achar ANG_MIN e ANG_MAX)</span>
+  <span class="kw">if</span> ((<span class="kw">long</span>)(millis() - proximoPrint) &gt;= 0) {
+    proximoPrint = millis() + 250;
+    <span class="kw">for</span> (<span class="kw">uint8_t</span> j = 0; j &lt; 4; j++) {
+      Serial.print(NOME_JUNTA[j]);
+      Serial.print(<span class="st">':'</span>);
+      Serial.print(anguloEscrito[j]);
+      Serial.print(<span class="st">' '</span>);
+    }
+    Serial.print(F(<span class="st">"| gravadas:"</span>));
+    Serial.print(numPosicoes);
+    Serial.println(repetindo ? F(<span class="st">" | REPETINDO"</span>) : F(<span class="st">""</span>));
+  }
+}
+</code></pre></div>
+  </div>
+</section>
+
+<section id="gravar">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">DIFERENCIAL</span>
+      <h2>Ensinar uma tarefa ao braço</h2>
+      <p>É assim que se programa muito robô de fábrica: alguém leva o robô pelas posições, ele grava e depois repete. Aqui você faz o mesmo com os joysticks.</p>
+    </div>
+    <figure class="dg">
+      <div class="scroll">
+      <svg viewBox="0 0 900 190" role="img" aria-labelledby="gr-t">
+        <title id="gr-t">Sequência de quatro posições gravadas, P1 a P4, que o braço repete em loop</title>
+        <circle cx="110" cy="80" r="40" class="d-servo"/><text class="d-servot" x="110" y="86" text-anchor="middle">P1</text>
+        <circle cx="330" cy="80" r="40" class="d-servo"/><text class="d-servot" x="330" y="86" text-anchor="middle">P2</text>
+        <circle cx="550" cy="80" r="40" class="d-servo"/><text class="d-servot" x="550" y="86" text-anchor="middle">P3</text>
+        <circle cx="770" cy="80" r="40" class="d-servo"/><text class="d-servot" x="770" y="86" text-anchor="middle">P4</text>
+        <path class="d-thin" style="stroke-width:2.4" d="M154,80 H282" marker-end="url(#ah-ink)"/>
+        <path class="d-thin" style="stroke-width:2.4" d="M374,80 H502" marker-end="url(#ah-ink)"/>
+        <path class="d-thin" style="stroke-width:2.4" d="M594,80 H722" marker-end="url(#ah-ink)"/>
+        <path class="d-thin" style="stroke-width:2.4" d="M770,124 V150 H110 V128" marker-end="url(#ah-ink)"/>
+        <text class="d-l" x="440" y="172" text-anchor="middle">repete em loop até você clicar no joystick 2 ou mexer um joystick</text>
+        <text class="d-l" x="110" y="24" text-anchor="middle">acima do objeto</text>
+        <text class="d-l" x="330" y="24" text-anchor="middle">desce e fecha</text>
+        <text class="d-l" x="550" y="24" text-anchor="middle">leva ao destino</text>
+        <text class="d-l" x="770" y="24" text-anchor="middle">abre e sobe</text>
+      </svg>
+      </div>
+      <figcaption><strong>Uma tarefa de “pegar e levar”.</strong> Cada clique no joystick 1 grava onde o braço está. Um clique no joystick 2 faz ele repetir tudo sozinho, com uma pausa em cada ponto.</figcaption>
+    </figure>
+    <div class="duas">
+      <div class="painel">
+        <h3>Passo a passo: pegar uma tampinha</h3>
+        <ol class="list">
+          <li>Segure o joystick 1 por 2 s para apagar gravações antigas.</li>
+          <li>Leve a garra, aberta, para cima da tampinha. Clique no joystick 1.</li>
+          <li>Desça até a tampinha. Clique.</li>
+          <li>Feche a garra. Clique.</li>
+          <li>Suba. Clique.</li>
+          <li>Gire até o destino e desça. Clique.</li>
+          <li>Abra a garra. Clique.</li>
+          <li>Suba e volte para perto do início. Clique.</li>
+          <li>Coloque a tampinha de volta e clique no joystick 2. O braço repete tudo sozinho.</li>
+        </ol>
+      </div>
+      <div class="painel">
+        <h3>Dicas para ficar bom</h3>
+        <ul class="list">
+          <li><strong>Grave abrir e fechar a garra como pontos separados.</strong> Senão o braço fecha a garra enquanto ainda está descendo.</li>
+          <li><strong>Grave pontos “acima”</strong> antes de descer e depois de pegar. O braço vai em linha reta de um ponto ao outro e pode arrastar o objeto.</li>
+          <li><strong>Marque na mesa</strong> com fita onde ficam o objeto e o destino. O braço repete as posições, não “vê” o objeto.</li>
+          <li><strong>Use um objeto leve</strong>, como tampinha, bolinha de papel ou dado. O SG90 tem pouca força.</li>
+          <li><code>p</code> no Monitor Serial lista os ângulos gravados. Bom para mostrar à banca.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ordem">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">ORDEM</span>
+      <h2>Ordem de montagem e calendário</h2>
+      <p>O kit chega no sábado, 24 de outubro. Até o dia 10 de novembro sobram duas semanas, o que dá folga se você não pular etapas.</p>
+    </div>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Quando</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td class="num">qua 21 – sex 23/out</td><td>Comprar o kit, baixar e ler o manual. Confirmar com o professor que kit comprado vale. Instalar a Arduino IDE.</td></tr>
+          <tr><td class="num">sáb 24 – dom 25/out</td><td>Conferir as peças e montar a mecânica pelo manual, com cada servo em 90° antes de fixar a alavanca.</td></tr>
+          <tr><td class="num">seg 26/out</td><td>Ligar a energia (jumper SEL fora) e rodar o <strong>código do manual</strong>. Se funcionar, o hardware está certo.</td></tr>
+          <tr><td class="num">ter 27 – qui 29/out</td><td>Gravar o <code>braco_robotico</code>, conferir o sentido de cada junta e medir os limites.</td></tr>
+          <tr><td class="num">sex 30/out – seg 2/nov</td><td>Ensaiar a tarefa de pegar e levar até ela dar certo 10 vezes seguidas. O dia 2 é feriado.</td></tr>
+          <tr><td class="num">ter 3 – qua 4/nov</td><td>Slides e roteiro da apresentação, fotos e vídeo do braço.</td></tr>
+          <tr><td class="num">qui 5 – seg 9/nov</td><td>Folga para imprevistos e ensaios com cronômetro. Se sobrar tempo, comece um dos próximos projetos.</td></tr>
+          <tr><td class="num"><strong>ter 10/nov</strong></td><td>Apresentação.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ol class="etapas read">
+      <li><h3>Conferir as peças</h3><p>Compare com a lista do anúncio: Uno, shield, 4 servos, 2 joysticks, fonte, borne, cabo extensor, peças, rolamentos e parafusos.</p><span class="pronto">nada faltando. Se faltar, reclame logo no Mercado Livre.</span></li>
+      <li><h3>Centralizar os servos</h3><p>Antes de prender as alavancas, ligue cada servo e mande para 90°. O código do manual ou o <code>braco_robotico</code> fazem isso ao ligar.</p><span class="pronto">todas as alavancas presas com o servo em 90°.</span></li>
+      <li><h3>Montar a mecânica</h3><p>Siga o manual. Não aperte demais os parafusos nas peças impressas, porque o plástico racha.</p><span class="pronto">cada junta gira com a mão, sem travar, antes de ligar a energia.</span></li>
+      <li><h3>Energia e código do manual</h3><p>Jumper SEL fora, fonte no borne, Uno na USB.</p><span class="pronto">o braço obedece aos joysticks com o código do manual.</span></li>
+      <li><h3>Programa deste guia</h3><p>Grave o <code>braco_robotico</code>, ajuste os pinos se o manual usar outros e meça os limites.</p><span class="pronto">nenhuma junta bate ou zumbe nos extremos.</span></li>
+      <li><h3>A tarefa</h3><p>Grave o “pegar e levar” e repita várias vezes.</p><span class="pronto">funciona 10 vezes seguidas sem derrubar o objeto.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section id="problemas">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">PROBLEMAS</span>
+      <h2>Quando algo não funcionar</h2>
+    </div>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Sintoma</th><th>Causa mais provável</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>Nenhum servo se mexe</td><td>Fonte desligada, + e − trocados, ou jumper SEL fora sem fonte no borne</td><td>Meça o borne azul com o multímetro: ~5 V.</td></tr>
+          <tr><td>Uno reinicia quando o braço mexe</td><td>Servos puxando energia do Uno (jumper SEL colocado)</td><td>Tire o SEL e use a fonte no borne.</td></tr>
+          <tr><td>Uma junta anda sozinha</td><td>Joystick fora do centro ou mexido ao ligar</td><td>Reinicie sem tocar nos joysticks. Aumente <code>ZONA_MORTA</code>.</td></tr>
+          <tr><td>Junta anda para o lado errado</td><td>Montagem espelhada</td><td>Troque para <code>true</code> o valor dela em <code>INVERTER</code>.</td></tr>
+          <tr><td>Junta não chega até o fim</td><td>Limite <code>ANG_MIN</code>/<code>ANG_MAX</code> apertado</td><td>Abra o limite aos poucos, sem deixar bater.</td></tr>
+          <tr><td>Servo zumbe parado e esquenta</td><td>Junta forçando contra a peça ou contra o peso</td><td>Reduza o limite daquela junta. No ombro, considere o MG90S.</td></tr>
+          <tr><td>Ombro cai ou treme com o braço esticado</td><td>SG90 fraco para o peso</td><td>Grave posições com o braço menos esticado ou troque o ombro por MG90S.</td></tr>
+          <tr><td>Ao repetir, servos tremem ou o Uno reinicia</td><td>Todas as juntas andando juntas: a fonte de 2 A no limite</td><td>Reduza <code>VEL_REPETIR</code> para 40.</td></tr>
+          <tr><td>“Grave pelo menos 2 posições”</td><td>Repetir com menos de 2 pontos gravados</td><td>Clique no joystick 1 em pelo menos duas posições.</td></tr>
+          <tr><td>Clique do joystick não faz nada</td><td>SW no pino errado</td><td>Confira D2 e D4 (ou os pinos do manual) e os números no código.</td></tr>
+          <tr><td>Uno não aparece na porta USB</td><td>Cabo, ou falta o driver CH340 (placas compatíveis)</td><td>Teste outro cabo e instale o driver CH340.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="banca">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">APRESENTAÇÃO</span>
+      <h2>Perguntas que a banca provavelmente vai fazer</h2>
+    </div>
+    <div class="qa">
+      <details open><summary>Você só montou um kit?</summary><p>“A mecânica e as peças vieram no kit. O programa é meu: controle por velocidade, limites de segurança para cada junta e um sistema que grava e repete tarefas, guardado na memória do Arduino. É o mesmo princípio dos robôs de fábrica, que são ensinados pela pessoa e depois repetem.”</p></details>
+      <details><summary>Por que a fonte não vai no Arduino?</summary><p>“Os quatro servos podem pedir mais de 2 A, e o Arduino pela USB entrega uns 500 mA. A fonte alimenta só os servos pela shield, e o Arduino fica na USB. O GND é o mesmo, para o sinal ter referência.”</p></details>
+      <details><summary>Por que controle por velocidade, e não por posição?</summary><p>“Com velocidade, soltar o joystick deixa a junta parada onde está. Por posição, soltar faria a junta voltar para o meio, e o braço não conseguiria segurar uma posição.”</p></details>
+      <details><summary>Como ele lembra as posições depois de desligar?</summary><p>“Elas ficam na EEPROM, uma memória do Arduino que não apaga sem energia. São 4 números por posição, um por junta, e cabem até 40 posições.”</p></details>
+      <details><summary>O que acontece se alguém mexer no joystick enquanto ele repete?</summary><p>“Ele para na hora. O controle manual sempre tem prioridade, por segurança.”</p></details>
+      <details><summary>Qual é a limitação?</summary><p>“Os servos SG90 têm pouca força, então ele só pega objetos leves. E ele repete posições, não enxerga o objeto: se o objeto mudar de lugar, ele erra. O próximo passo seria um sensor ou uma câmera.”</p></details>
+    </div>
+  </div>
+</section>
+
+<section id="dia">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">DIA DA APRESENTAÇÃO</span>
+      <h2>Roteiro e kit de emergência</h2>
+    </div>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Tempo</th><th>O que mostrar</th><th>O que falar</th></tr></thead>
+        <tbody>
+          <tr><td class="num">0:00–0:30</td><td>O braço parado</td><td>O que ele é: 4 juntas, 4 servos, controlado por um Arduino Uno.</td></tr>
+          <tr><td class="num">0:30–1:15</td><td>Controle com os joysticks</td><td>Quanto mais inclina, mais rápido. Soltou, parou. Mostre os limites protegendo as juntas.</td></tr>
+          <tr><td class="num">1:15–2:15</td><td>Gravar a tarefa ao vivo (ou usar a já gravada)</td><td>“Agora eu ensino o braço.” Um clique por posição.</td></tr>
+          <tr><td class="num">2:15–3:00</td><td>Clique no joystick 2: ele repete sozinho</td><td>Robô industrial em miniatura. Mexa num joystick para mostrar que ele para.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="duas">
+      <div class="painel">
+        <h3>Na mochila</h3>
+        <ul class="list">
+          <li>Fonte, borne P4 e cabo USB do Uno</li>
+          <li>Notebook com a Arduino IDE e o programa com os <strong>seus</strong> limites</li>
+          <li>1 servo de reserva, chave Allen e chave de fenda pequena</li>
+          <li>Fita para marcar na mesa onde ficam o objeto e o destino</li>
+          <li>O objeto da tarefa, mais um reserva</li>
+        </ul>
+      </div>
+      <div class="painel">
+        <h3>Antes de começar</h3>
+        <ol class="list">
+          <li>Ligue o Uno sem tocar nos joysticks.</li>
+          <li>Confira com <code>p</code> que a tarefa está gravada.</li>
+          <li>Marque a mesa e rode a tarefa uma vez.</li>
+          <li>Desligue a fonte entre uma apresentação e outra.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="futuro">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">DEPOIS</span>
+      <h2>Próximos projetos com o mesmo braço</h2>
+      <p>As peças ficam com você. Estas ideias usam o mesmo braço, em ordem de dificuldade.</p>
+    </div>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Ideia</th><th>O que acrescenta</th><th>Peças extras</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Controle pelo celular</strong></td><td>Um app de Bluetooth manda os ângulos</td><td>Módulo HC-05</td></tr>
+          <tr><td><strong>Controle por luva</strong></td><td>Sensores Hall e ímãs na sua mão, como no projeto anterior</td><td>Sensores SS49E, ímãs, luva</td></tr>
+          <tr><td><strong>Achar o objeto sozinho</strong></td><td>Um sensor de distância diz onde está o objeto</td><td>Sensor ultrassônico HC-SR04</td></tr>
+          <tr><td><strong>Garra que sente</strong></td><td>Para de fechar quando encosta no objeto</td><td>Sensor de força (FSR)</td></tr>
+          <tr><td><strong>Visão</strong></td><td>Uma câmera e o computador escolhem o objeto pela cor</td><td>Webcam e Python com OpenCV</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="fim">
+  <div class="wrap">
+    <h3>Fontes</h3>
+    <ul>
+      <li>Descrição do kit MakerQuest Mark 2 no anúncio que você enviou. Não achei outras informações sobre ele na internet.</li>
+      <li><a href="https://protosupplies.com/product/sensor-shield-v5-0/" target="_blank" rel="noopener">Sensor Shield V5.0 (ProtoSupplies)</a> · jumper SEL e borne de alimentação externa</li>
+      <li><a href="https://forum.arduino.cc/t/sensor-shield-v5/534313" target="_blank" rel="noopener">Fórum Arduino: Sensor Shield V5</a> · posição do jumper e variações entre placas</li>
+      <li><a href="https://zbotic.in/arduino-power-supply-guide-vin-5v-pin-external-power/" target="_blank" rel="noopener">Guia de alimentação do Arduino (Zbotic)</a> · o conector P4 do Uno pede 7–12 V</li>
+      <li><a href="https://forum.arduino.cc/t/project-power-considerations/1136355/4" target="_blank" rel="noopener">Fórum Arduino: alimentação de projetos</a></li>
+      <li><a href="https://tams.informatik.uni-hamburg.de/lehre/2023ss/vorlesung/es/doc/sg90.pdf" target="_blank" rel="noopener">TowerPro SG90, datasheet</a> · tensão e torque; correntes de medições publicadas</li>
+      <li><a href="https://raw.githubusercontent.com/arduino-libraries/Servo/master/docs/readme.md" target="_blank" rel="noopener">Biblioteca Servo.h</a></li>
+    </ul>
+    <p class="small muted">O guia da mão robótica com luva continua disponível no mesmo repositório, caso você volte para aquele projeto.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  document.querySelectorAll('.codigo').forEach(function (bloco) {
+    var btn = bloco.querySelector('button');
+    var pre = bloco.querySelector('pre');
+    if (!btn || !pre) return;
+    btn.addEventListener('click', function () {
+      var texto = pre.innerText;
+      var ok = function () { btn.textContent = 'Copiado'; setTimeout(function () { btn.textContent = 'Copiar código'; }, 1800); };
+      var falha = function () {
+        var r = document.createRange(); r.selectNodeContents(pre);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        btn.textContent = 'Selecionado: use Ctrl+C';
+      };
+      try { navigator.clipboard.writeText(texto).then(ok, falha); } catch (e) { falha(); }
+    });
+  });
+})();
+</script>
