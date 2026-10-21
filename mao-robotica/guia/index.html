@@ -368,13 +368,14 @@ footer.fim a { word-break: break-word; }
     <div class="sec-head">
       <span class="num">RESUMO</span>
       <h2>O que eu faria no seu lugar</h2>
-      <p>Seis decisões. O resto do guia explica cada uma.</p>
+      <p>Sete decisões. O resto do guia explica cada uma.</p>
     </div>
     <div class="decisoes">
       <div class="decisao"><span class="k">Ordem</span><span class="v">Faça primeiro a versão com fio</span><p>Luva ligada por cabo direto no Uno. Ela tem menos peças e menos chances de falhar, e é ela que salva a sua apresentação se o sem fio der problema.</p></div>
       <div class="decisao"><span class="k">Energia</span><span class="v">Servos nas pilhas, Uno na USB</span><p>Use 4 pilhas AA recarregáveis (4,8 V) só para os servos. O Uno só manda o sinal. O GND das pilhas tem que ser ligado no GND do Uno.</p></div>
       <div class="decisao"><span class="k">Sensor</span><span class="v">SS49E analógico</span><p>Custa praticamente o mesmo que o A3144, funciona em 3,3 V e 5 V e permite escolher o ponto de fechar no código. O A3144 só diz sim ou não.</p></div>
       <div class="decisao"><span class="k">Posição</span><span class="v">Um de cada lado do nó do dedo</span><p>Sensor nas costas da mão, logo antes do nó. Ímã na falange proximal, logo depois. O sinal acompanha o movimento inteiro e nenhum fio passa por articulação.</p></div>
+      <div class="decisao"><span class="k">Dinheiro</span><span class="v">Só o kit e uns extras</span><p>Arduino, sensores e ferramentas são do SENAI. Você compra o kit da mão e poucos itens, entre R$ 230 e R$ 335. Antes, confirme lá qual sensor Hall eles têm.</p></div>
       <div class="decisao"><span class="k">Sem fio</span><span class="v">2 ESP32 com ESP-NOW</span><p>Um ESP32 na luva e outro junto da mão. O segundo repassa os dados para o Uno por um fio. O Uno continua sendo o cérebro dos servos, então a regra é cumprida.</p></div>
       <div class="decisao"><span class="k">Dia da apresentação</span><span class="v">Leve o cabo da versão 1</span><p>Se o rádio falhar no meio da feira, troque o firmware e ligue a luva por fio em 5 minutos.</p></div>
     </div>
@@ -391,12 +392,20 @@ footer.fim a { word-break: break-word; }
     </div>
     <div class="criticas read">
       <div class="critica">
+        <span class="chip medio">Médio</span>
+        <div>
+          <h3>“Tem no SENAI” ainda não quer dizer “tenho”</h3>
+          <p>O projeto inteiro depende de um sensor Hall <strong>linear</strong> (SS49E). Se o laboratório só tiver o A3144 ou o módulo KY-003, o dedo só abre ou fecha, sem posição intermediária. Além disso, você pode ter que usar tudo lá dentro, sem levar para casa, e talvez não possa soldar sensor numa luva que sairá do laboratório. Confirmar isso custa uma visita.</p>
+          <p class="fix"><strong>O que fazer:</strong> vá ao SENAI nesta semana com a lista da seção <a href="#compras">Compras</a>. Se não houver o SS49E, comprar 10 por R$ 18–22 resolve, e é o único item que vale comprar por segurança.</p>
+        </div>
+      </div>
+      <div class="critica">
         <span class="chip grave">Grave</span>
         <div>
           <h3>O prazo é apertado: uns 20 dias até 10 de novembro</h3>
           <p>A entrega das peças leva de 3 a 7 dias, então sobram umas duas semanas de montagem. Para quem está começando, eu estimo de 4 a 6 semanas para o projeto completo. A versão com fio cabe nesse prazo. A sem fio só cabe se nada der errado, e em projeto de robótica alguma coisa sempre dá errado.</p>
           <p>O dia 15 de novembro de 2026 cai num domingo e é feriado. Confirme a data com o professor e planeje para o dia 10.</p>
-          <p class="fix"><strong>O que fazer:</strong> compre tudo nesta semana, de vendedores com entrega rápida, e siga o <a href="#ordem">calendário</a>. A data de corte é <strong>4 de novembro</strong>: se a versão 1 não estiver funcionando até lá, esqueça o ESP32.</p>
+          <p class="fix"><strong>O que fazer:</strong> peça o kit <strong>hoje</strong>, porque é o único item que demora a chegar. Como o resto está no SENAI, use a espera para montar e testar a luva lá. Siga o <a href="#ordem">calendário</a>. A data de corte é <strong>4 de novembro</strong>: se a versão 1 não estiver funcionando até lá, esqueça o ESP32.</p>
         </div>
       </div>
       <div class="critica">
@@ -582,9 +591,40 @@ footer.fim a { word-break: break-word; }
   <div class="wrap">
     <div class="sec-head">
       <span class="num">COMPRAS</span>
-      <h2>O kit e a lista de compras</h2>
-      <p>Os preços são faixas aproximadas pesquisadas em outubro de 2026. Confira antes de comprar, porque eles mudam toda semana.</p>
+      <h2>O que comprar e o que pedir no SENAI</h2>
+      <p>Quase tudo está no laboratório. Falta o kit da mão, e esse é o item que decide o seu prazo.</p>
     </div>
+    <div class="aviso dica">
+  <span class="rot">Como o gasto fica</span>
+  <p>Como Arduino, sensores e ferramentas são do SENAI, você precisa <strong>comprar o kit</strong> (a mão e os 5 servos, R$ 227 no anúncio que você escolheu) e <strong>uns poucos extras</strong>. O gasto total fica entre <strong>R$ 230 e R$ 335</strong>, dependendo do que o SENAI tiver (R$ 355 com um servo reserva). Os preços vêm das buscas de outubro de 2026 e podem ter mudado.</p>
+</div>
+<div class="duas">
+  <div class="painel">
+    <h3>O que você compra</h3>
+    <ul class="list">
+      <li><strong>Kit da mão com 5 servos SG90:</strong> R$ 227. É o único item com prazo de entrega, então é o primeiro a pedir.</li>
+      <li><strong>Luva fina e justa:</strong> R$ 5–15 (algodão ou helanca).</li>
+      <li><strong>Super cola e cola quente:</strong> uns R$ 5–10, se o SENAI não tiver.</li>
+      <li><strong>Linha de pesca e elásticos:</strong> R$ 12–20, só se o kit não vier com linha para os tendões.</li>
+      <li><strong>Ímãs de neodímio 5×2 mm:</strong> lote de 50 por R$ 18–31, se o SENAI não tiver.</li>
+      <li><strong>Sensor Hall SS49E:</strong> kit de 10 por R$ 18–22, <em>somente</em> se o SENAI não tiver o modelo linear (veja ao lado).</li>
+      <li><strong>Servo reserva:</strong> R$ 15–20. Os servos do kit costumam ser clones frágeis. Recomendo ter um.</li>
+    </ul>
+  </div>
+  <div class="painel">
+    <h3>O que confirmar no SENAI esta semana</h3>
+    <ol class="list">
+      <li><strong>Qual sensor Hall eles têm?</strong> Este projeto precisa do <strong>SS49E (ou 49E) linear</strong>. O A3144 e o KY-003 são digitais e só dizem “perto” ou “longe”. O módulo KY-024 serve para testar, porque o pino A0 dele é o sinal analógico de um 49E, mas é grande demais para a luva.</li>
+      <li>Quantos sensores? Você precisa de <strong>5, mais 1 ou 2 de reserva</strong>.</li>
+      <li>Tem <strong>ímãs de neodímio pequenos</strong> (5×2 ou 6×3 mm)?</li>
+      <li><strong>Pode levar para casa ou só usa lá?</strong> E pode <strong>soldar</strong> os sensores na luva e ficar com ela? Sensor solto num projeto não volta ao estoque.</li>
+      <li>Tem <strong>Arduino Uno R3</strong> com cabo USB, protoboard, jumpers, fio fino, ferro de solda e termo-retrátil?</li>
+      <li>Tem <strong>fonte de bancada</strong> de 5 V com 3 A ou mais? Ela substitui as pilhas (veja a seção Energia).</li>
+      <li>Tem <strong>2 ESP32 DevKit V1</strong>? Se não tiver, não compre: faça só a versão com fio.</li>
+      <li>Qual é o <strong>horário do laboratório</strong>? O calendário depende dele.</li>
+    </ol>
+  </div>
+</div>
     <div class="duas">
   <div class="painel">
     <h3>O que dá para saber do anúncio</h3>
@@ -620,7 +660,8 @@ footer.fim a { word-break: break-word; }
   <div class="peca"><div class="foto"><img src="img/esp32.png" alt="Placa ESP32 DevKit V1 de 30 pinos" width="700" height="387"></div><div class="txt"><strong>ESP32 DevKit V1</strong><span>Só na versão 2: um na luva, outro junto da mão.</span></div></div>
 </div>
 <p class="small muted">Ilustrações no estilo Fritzing. Os créditos estão no fim da página.</p>
-    <h3>Lista de compras</h3>
+    <h3>Lista completa com preços</h3>
+<p class="read small muted">Use esta tabela para o que faltar no SENAI. Os itens do bloco “as duas versões” que o laboratório já tem você não precisa comprar.</p>
 <div class="tabela">
   <table class="compra">
     <thead><tr><th>Item</th><th>Qtd.</th><th class="num">Preço aprox.</th><th>Para quê / cuidado</th><th>Onde</th></tr></thead>
@@ -788,6 +829,7 @@ footer.fim a { word-break: break-word; }
     <thead><tr><th>Opção</th><th>Tensão</th><th>Veredito</th><th>Por quê</th></tr></thead>
     <tbody>
       <tr><td><strong>4 × AA NiMH</strong></td><td class="num">4,8 V</td><td><span class="chip ok">Use esta</span></td><td>Tensão dentro da faixa do SG90, aguenta os picos e é recarregável. Não precisa de regulador.</td></tr>
+      <tr><td><strong>Fonte de bancada do SENAI</strong></td><td class="num">5,0 V</td><td><span class="chip ok">Ótima, se tiver</span></td><td>Regule a tensão para 5,0 V e o limite de corrente para 3 A <strong>antes</strong> de ligar os servos, e confira a tensão com o multímetro. Nunca passe de 6 V. Ligue o GND dela ao GND do Uno.</td></tr>
       <tr><td><strong>Fonte 5 V 3 A na tomada</strong></td><td class="num">5,0 V</td><td><span class="chip ok">Boa na bancada</span></td><td>Barata e nunca acaba. Só serve se houver tomada perto da mesa da apresentação.</td></tr>
       <tr><td><strong>4 × AA alcalina</strong></td><td class="num">até ~6,4 V</td><td><span class="chip medio">Evite</span></td><td>Novas passam do máximo do SG90. Depois caem rápido com a corrente dos servos.</td></tr>
       <tr><td><strong>Power bank USB</strong></td><td class="num">5,0 V</td><td><span class="chip medio">Só para teste</span></td><td>Muitos cortam a saída no pico de corrente ou quando o consumo cai, e a mão “desliga” sozinha.</td></tr>
@@ -3060,8 +3102,8 @@ Servo servo[5];
       <table>
         <thead><tr><th>Quando</th><th>O que fazer</th><th>Etapas abaixo</th></tr></thead>
         <tbody>
-          <tr><td class="num">qua 21 – sex 23/out</td><td><strong>Comprar tudo.</strong> Prefira anúncios com entrega rápida (“chega amanhã”, Full). Confirme que o kit sai do Brasil. Instale a Arduino IDE e leia este guia inteiro.</td><td>—</td></tr>
-          <tr><td class="num">sáb 24 – ter 27/out</td><td>Enquanto as peças não chegam: teste o que você já tem (Uno + 1 servo), prepare a luva e escreva o roteiro da apresentação.</td><td>—</td></tr>
+          <tr><td class="num">qua 21 – sex 23/out</td><td><strong>Pedir o kit hoje</strong>, com entrega rápida (“chega amanhã”, Full), e confirmar que ele sai do Brasil. Ir ao SENAI inventariar (lista na seção Compras). Instalar a Arduino IDE e ler este guia.</td><td>—</td></tr>
+          <tr><td class="num">sáb 24 – ter 27/out</td><td>Enquanto o kit não chega, <strong>no SENAI</strong>: rodar o <code>teste_sensores</code> com sensor e ímã presos com fita, achar a melhor posição de cada dedo e montar a luva. Nada disso precisa da mão.</td><td>—</td></tr>
           <tr><td class="num">qua 28 – qui 29/out</td><td>Um servo e um sensor. Depois os 5 servos nas pilhas.</td><td class="num">1–2</td></tr>
           <tr><td class="num">sex 30/out – seg 2/nov</td><td>Montar a mão, passar os tendões e calibrar os ângulos. O dia 2 é feriado (Finados), então aproveite.</td><td class="num">3–4</td></tr>
           <tr><td class="num">ter 3 – qua 4/nov</td><td>Luva pronta e versão 1 completa.</td><td class="num">5–6</td></tr>
@@ -3073,8 +3115,8 @@ Servo servo[5];
       </table>
     </div>
     <div class="aviso cuidado">
-      <span class="rot">Comprar ou não os ESP32 agora?</span>
-      <p>Se você esperar a versão 1 ficar pronta para só então comprar os ESP32, eles não chegam a tempo. Então compre <strong>agora</strong> se o dinheiro (uns R$ 80–160) não fizer falta, sabendo que talvez nem use. Se o dinheiro for apertado, não compre e faça só a versão 1 bem feita. Uma mão com fio que funciona vale mais que uma sem fio que trava.</p>
+      <span class="rot">E os ESP32?</span>
+      <p>Só faça a versão sem fio se o SENAI tiver <strong>2 ESP32 DevKit V1</strong> para você usar. Se for preciso comprar (R$ 80–160 a mais), não vale, e a versão com fio bem feita impressiona mais que uma sem fio que trava. Se o SENAI tiver, a decisão deixa de ser de dinheiro e passa a ser de tempo: continua valendo a data de corte de 4 de novembro.</p>
     </div>
     <ol class="etapas read">
       <li><h3>Um servo, um sensor, na protoboard</h3><p>Uno na USB, 1 servo nas pilhas com GND comum, 1 SS49E em A0. Rode <code>mao_com_fio</code> só com o polegar ligado.</p><span class="pronto">o servo vira quando você aproxima o ímã do sensor.</span></li>
