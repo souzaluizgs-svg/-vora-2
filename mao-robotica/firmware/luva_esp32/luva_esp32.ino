@@ -21,11 +21,16 @@
   Este codigo e para o ESP32 "classico" (DevKit V1, modulo ESP-WROOM-32).
   ESP32-S3/C3/C6 tem outros numeros de pino.
 
-  Ao ligar (CALIBRACAO, so no modo SS49E):
-    1) LED azul (GPIO2) piscando DEVAGAR: mao ABERTA (~3 s)
-    2) LED piscando RAPIDO: punho FECHADO (~3 s)
-    3) Depois o LED pisca curtinho de vez em quando = enviando.
-    Para calibrar de novo, aperte o botao EN (reset) do ESP32.
+  CALIBRACAO (so no modo SS49E). Siga o LED azul (GPIO2):
+    1) piscando DEVAGAR : mao ABERTA, dedos esticados (~3 s)
+    2) piscando MEDIO   : dedos dobrados SO NA BASE, ate a metade, como um C
+    3) piscando RAPIDO  : PUNHO fechado (~3 s)
+    4) depois pisca curtinho de vez em quando = enviando.
+    A calibracao fica GUARDADA na memoria do ESP32: ao ligar de novo, ele
+    usa a ultima. Para calibrar de novo, aperte o botao BOOT da placa
+    (rapidinho, com o programa ja rodando) ou digite c no Monitor Serial.
+    Calibre de novo sempre que vestir a luva.
+    (Nao segure o BOOT enquanto liga a placa: isso entra no modo gravacao.)
 
   Placa na IDE: "ESP32 Dev Module" (ou "DOIT ESP32 DEVKIT V1").
   Monitor Serial: 115200.
@@ -35,6 +40,7 @@
 #include <WiFi.h>
 #include <esp_now.h>
 #include <esp_wifi.h>
+#include <Preferences.h>
 
 // ---------------- Tipo de sensor ----------------
 // 0 = SS49E (analogico, recomendado)   1 = A3144 (digital)
@@ -47,10 +53,15 @@
 // Use o A3144 avulso: o modulo KY-003 ja tem resistor para o 5 V.
 #define USAR_A3144 0
 
+// 1 = calibracao em 3 posicoes (aberta, meio, fechada): movimento mais "reto".
+// 0 = so aberta e fechada.
+#define CALIBRAR_MEIO 1
+
 // ---------------- Pinos (ordem: polegar, indicador, medio, anelar, minimo)
 const uint8_t PINO_SENSOR[5] = { 36, 34, 35, 32, 33 };
 const char*   NOME_DEDO[5]   = { "polegar", "indicador", "medio", "anelar", "minimo" };
 const uint8_t PINO_LED = 2;          // LED azul da placa
+const uint8_t PINO_BOTAO = 0;        // botao BOOT da placa (ja tem pull-up)
 
 // ---------------- Ajustes ----------------
 const uint8_t CANAL_WIFI = 1;        // os dois ESP32 precisam usar o MESMO canal
@@ -59,6 +70,10 @@ const uint8_t LEITURAS_MEDIA = 8;    // quantas leituras do ADC para fazer a med
 const float ALFA = 0.3;              // filtro: perto de 0 = mais suave, 1 = sem filtro
 const unsigned long TEMPO_CALIBRACAO_MS = 3000; // use 2000 ou mais (o 1o segundo e ignorado)
 const int   DIFERENCA_MINIMA = 120;  // em leituras do ADC (0..4095); nunca 0
+// Com 3,3 V o SS49E fica entre ~0,9 e ~2,4 V. Leitura nas pontas = fio solto
+// (ou um clone de 49E que nao funciona em 3,3 V).
+const int   LEITURA_MIN_VALIDA = 60;
+const int   LEITURA_MAX_VALIDA = 4030;
 const float LIMIAR_FECHAR = 70;      // so A3144 (histerese)
 const float LIMIAR_ABRIR  = 30;
 
@@ -78,8 +93,15 @@ uint8_t ENDERECO_TODOS[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }; // broadcast
 PacoteMao pacote;
 int   leituraCrua[5];
 int   valorAberto[5];
+int   valorMeio[5];
 int   valorFechado[5];
 bool  sensorOk[5];
+bool  meioOk[5];
+bool  fioSolto[5];
+Preferences memoria;
+bool  botaoAntes = false;
+unsigned long inicioAperto = 0;
+unsigned long proximoAvisoFio = 0;
 float pctFiltrado[5];
 bool  dedoFechado[5];
 unsigned long proximoEnvio = 0;
@@ -121,27 +143,95 @@ void medirMedia(int resultado[5], unsigned long meioPiscar) {
   digitalWrite(PINO_LED, LOW);
 }
 
-void calibrarSensores() {
-  Serial.println("CALIBRACAO 1/2: deixe a mao ABERTA (LED piscando devagar)...");
-  medirMedia(valorAberto, 400);
-  Serial.println("CALIBRACAO 2/2: FECHE o punho (LED piscando rapido)...");
-  medirMedia(valorFechado, 80);
+bool leituraValida(int leitura) {
+  return leitura >= LEITURA_MIN_VALIDA && leitura <= LEITURA_MAX_VALIDA;
+}
 
-  Serial.println("Resultado:");
+// Confere cada dedo depois de calibrar (ou de carregar da memoria).
+void conferirCalibracao() {
   for (uint8_t i = 0; i < 5; i++) {
     int diferenca = abs(valorFechado[i] - valorAberto[i]);
-    sensorOk[i] = (diferenca >= DIFERENCA_MINIMA && diferenca > 0);  // > 0: evita dividir por zero
-    Serial.printf("  %-9s aberto=%4d fechado=%4d  %s\n", NOME_DEDO[i],
-                  valorAberto[i], valorFechado[i],
-                  sensorOk[i] ? "OK" : "POUCA DIFERENCA! Aproxime o ima. Dedo vai ficar parado.");
+    bool valida = leituraValida(valorAberto[i]) && leituraValida(valorFechado[i]);
+    sensorOk[i] = valida && diferenca >= DIFERENCA_MINIMA && diferenca > 0;  // > 0: evita dividir por zero
+    long lado = (valorFechado[i] > valorAberto[i]) ? 1 : -1;
+    long m = (long)(valorMeio[i] - valorAberto[i]) * lado;
+    long f = (long)(valorFechado[i] - valorAberto[i]) * lado;
+    meioOk[i] = CALIBRAR_MEIO && sensorOk[i] && m > f / 8 && m < f - f / 8;
+    const char* situacao = !valida ? "FIO SOLTO? (ou 49E que nao funciona em 3,3 V)"
+                         : !sensorOk[i] ? "POUCA DIFERENCA! Aproxime o ima. Dedo vai ficar parado."
+                         : (CALIBRAR_MEIO && !meioOk[i]) ? "OK (meio fora da faixa: usando so aberto/fechado)"
+                         : "OK";
+    Serial.printf("  %-9s aberto=%4d meio=%4d fechado=%4d  %s\n", NOME_DEDO[i],
+                  valorAberto[i], valorMeio[i], valorFechado[i], situacao);
   }
 }
 
+void salvarCalibracao() {
+  int dados[15];
+  for (uint8_t i = 0; i < 5; i++) { dados[i] = valorAberto[i]; dados[5 + i] = valorMeio[i]; dados[10 + i] = valorFechado[i]; }
+  memoria.putBytes("cal", dados, sizeof(dados));
+}
+
+bool carregarCalibracao() {
+  int dados[15];
+  if (memoria.getBytes("cal", dados, sizeof(dados)) != sizeof(dados)) return false;
+  for (uint8_t i = 0; i < 5; i++) { valorAberto[i] = dados[i]; valorMeio[i] = dados[5 + i]; valorFechado[i] = dados[10 + i]; }
+  return true;
+}
+
+void calibrarSensores() {
+  // Durante a calibracao nada e enviado: o Uno abre a mao (failsafe).
+#if CALIBRAR_MEIO
+  Serial.println("CALIBRACAO 1/3: mao ABERTA, dedos esticados (LED devagar)...");
+  medirMedia(valorAberto, 400);
+  Serial.println("CALIBRACAO 2/3: dobre so a BASE dos dedos ate a METADE, como um C (LED medio)...");
+  medirMedia(valorMeio, 180);
+  Serial.println("CALIBRACAO 3/3: FECHE o punho (LED rapido)...");
+  medirMedia(valorFechado, 70);
+#else
+  Serial.println("CALIBRACAO 1/2: mao ABERTA, dedos esticados (LED devagar)...");
+  medirMedia(valorAberto, 400);
+  Serial.println("CALIBRACAO 2/2: FECHE o punho (LED rapido)...");
+  medirMedia(valorFechado, 70);
+  for (uint8_t i = 0; i < 5; i++) valorMeio[i] = (valorAberto[i] + valorFechado[i]) / 2;
+#endif
+  Serial.println("Resultado:");
+  conferirCalibracao();
+  salvarCalibracao();
+  Serial.println("Calibracao guardada na memoria.");
+  for (uint8_t i = 0; i < 5; i++) pctFiltrado[i] = 0;
+}
+
 // Leitura -> 0..100 %. Funciona com o ima de qualquer lado.
+// Com o ponto do meio sao duas retas (0..50 % e 50..100 %), que corrigem a curva do ima.
 int paraPorcento(uint8_t i, int leitura) {
   if (!sensorOk[i]) return 0;
-  long p = (long)(leitura - valorAberto[i]) * 100L / (valorFechado[i] - valorAberto[i]);
+  long lado = (valorFechado[i] > valorAberto[i]) ? 1 : -1;
+  long v = (long)(leitura - valorAberto[i]) * lado;
+  long f = (long)(valorFechado[i] - valorAberto[i]) * lado;
+  long p;
+  if (meioOk[i]) {
+    long m = (long)(valorMeio[i] - valorAberto[i]) * lado;
+    if (v <= m) p = v * 50L / m;
+    else        p = 50L + (v - m) * 50L / (f - m);
+  } else {
+    p = v * 100L / f;
+  }
   return constrain(p, 0, 100);
+}
+
+// Botao BOOT (GPIO0, apertado = LOW) ou letra c no Monitor: calibra de novo.
+bool pediuCalibracao() {
+  bool pediu = false;
+  while (Serial.available() > 0) {
+    char c = Serial.read();
+    if (c == 'c' || c == 'C') pediu = true;
+  }
+  bool apertado = (digitalRead(PINO_BOTAO) == LOW);
+  if (apertado && !botaoAntes) inicioAperto = millis();
+  if (!apertado && botaoAntes && millis() - inicioAperto >= 40) pediu = true;  // 40 ms ignora ruido
+  botaoAntes = apertado;
+  return pediu;
 }
 
 void setup() {
@@ -200,14 +290,28 @@ void setup() {
   analogReadResolution(12);           // 0..4095
   analogSetAttenuation(ADC_11db);     // le de 0 ate ~3,1 V
   Serial.println("Sensor: SS49E (analogico).");
-  calibrarSensores();
+  memoria.begin("mao", false);
+  if (carregarCalibracao()) {
+    Serial.println("Usando a calibracao guardada:");
+    conferirCalibracao();
+    Serial.println("(Vestiu a luva de novo? Aperte BOOT ou digite c para calibrar.)");
+  } else {
+    calibrarSensores();
+  }
 #endif
+  pinMode(PINO_BOTAO, INPUT_PULLUP);
 
   Serial.println("Pronto! Enviando...");
   proximoEnvio = millis();
 }
 
 void loop() {
+#if !USAR_A3144
+  if (pediuCalibracao()) {
+    calibrarSensores();
+    proximoEnvio = millis();
+  }
+#endif
   if ((long)(millis() - proximoEnvio) < 0) return;
   proximoEnvio += PERIODO_MS;
 
@@ -220,7 +324,8 @@ void loop() {
     if (dedoFechado[i] && pctFiltrado[i] < LIMIAR_ABRIR)   dedoFechado[i] = false;
     pacote.pct[i] = dedoFechado[i] ? 100 : 0;
 #else
-    int bruto = paraPorcento(i, leituraCrua[i]);
+    fioSolto[i] = !leituraValida(leituraCrua[i]);
+    int bruto = fioSolto[i] ? 0 : paraPorcento(i, leituraCrua[i]);   // fio solto: dedo abre
     pctFiltrado[i] += ALFA * (bruto - pctFiltrado[i]);
     pacote.pct[i] = (uint8_t)(pctFiltrado[i] + 0.5);
 #endif
@@ -241,4 +346,12 @@ void loop() {
                   pacote.pct[0], pacote.pct[1], pacote.pct[2], pacote.pct[3], pacote.pct[4],
                   pacote.seq, errosEnvio);
   }
+#if !USAR_A3144
+  if ((long)(millis() - proximoAvisoFio) >= 0) {
+    proximoAvisoFio = millis() + 2000;
+    for (uint8_t i = 0; i < 5; i++) {
+      if (fioSolto[i]) Serial.printf("!! FIO SOLTO? sensor do %s\n", NOME_DEDO[i]);
+    }
+  }
+#endif
 }
