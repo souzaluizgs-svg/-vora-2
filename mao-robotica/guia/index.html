@@ -373,7 +373,7 @@ footer.fim a { word-break: break-word; }
       <div class="decisao"><span class="k">Ordem</span><span class="v">Faça primeiro a versão com fio</span><p>Luva ligada por cabo direto no Uno. Ela tem menos peças e menos chances de falhar, e é ela que salva a sua apresentação se o sem fio der problema.</p></div>
       <div class="decisao"><span class="k">Energia</span><span class="v">Servos nas pilhas, Uno na USB</span><p>Use 4 pilhas AA recarregáveis (4,8 V) só para os servos. O Uno só manda o sinal. O GND das pilhas tem que ser ligado no GND do Uno.</p></div>
       <div class="decisao"><span class="k">Sensor</span><span class="v">SS49E analógico</span><p>Custa praticamente o mesmo que o A3144, funciona em 3,3 V e 5 V e permite escolher o ponto de fechar no código. O A3144 só diz sim ou não.</p></div>
-      <div class="decisao"><span class="k">Ímãs</span><span class="v">Na ponta dos dedos da luva</span><p>Os ímãs não precisam de fio, então eles ficam na parte que mexe. Os sensores ficam na palma, onde a ponta do dedo encosta quando você fecha a mão.</p></div>
+      <div class="decisao"><span class="k">Posição</span><span class="v">Um de cada lado do nó do dedo</span><p>Sensor nas costas da mão, logo antes do nó. Ímã na falange proximal, logo depois. O sinal acompanha o movimento inteiro e nenhum fio passa por articulação.</p></div>
       <div class="decisao"><span class="k">Sem fio</span><span class="v">2 ESP32 com ESP-NOW</span><p>Um ESP32 na luva e outro junto da mão. O segundo repassa os dados para o Uno por um fio. O Uno continua sendo o cérebro dos servos, então a regra é cumprida.</p></div>
       <div class="decisao"><span class="k">Dia da apresentação</span><span class="v">Leve o cabo da versão 1</span><p>Se o rádio falhar no meio da feira, troque o firmware e ligue a luva por fio em 5 minutos.</p></div>
     </div>
@@ -407,11 +407,11 @@ footer.fim a { word-break: break-word; }
         </div>
       </div>
       <div class="critica">
-        <span class="chip grave">Grave</span>
+        <span class="chip medio">Médio</span>
         <div>
-          <h3>Sensor Hall com ímã é quase um botão liga/desliga</h3>
-          <p>O campo de um ímã pequeno cai muito rápido com a distância. Pelos cálculos da seção de sensores, ele só vira sinal útil quando o ímã está a menos de 1 a 1,5 cm do sensor. O seu dedo percorre uns 9 cm para fechar, então o sensor não percebe nada durante quase todo o movimento. Ele só reage no final, e o dedo robótico vai fechar de uma vez.</p>
-          <p class="fix"><strong>O que fazer:</strong> aceite e apresente como “gatilho por dedo”, com movimento suave feito no código. Não prometa movimento proporcional. Se quiser proporcional de verdade, o sensor certo é o sensor flexível (flex sensor), e ele é bem mais caro.</p>
+          <h3>Ímã que só se aproxima do sensor vira um botão liga/desliga</h3>
+          <p>O campo de um ímã pequeno cai muito rápido com a distância. Ele só vira sinal útil a menos de 1 a 1,5 cm do sensor. Se o ímã ficasse na ponta do dedo e o sensor na palma, como no plano inicial, o sensor não perceberia nada em quase todos os 9 cm do movimento, e o dedo robótico fecharia de uma vez.</p>
+          <p class="fix"><strong>O que fazer:</strong> use a posição da seção <a href="#luva">Luva</a>, com o sensor e o ímã a poucos milímetros um do outro, um de cada lado do nó do dedo. Ao dobrar, o ímã gira e se afasta aos poucos, e o sinal muda durante o movimento inteiro. Ela tem limitações próprias, que estão explicadas lá.</p>
         </div>
       </div>
       <div class="critica">
@@ -431,11 +431,11 @@ footer.fim a { word-break: break-word; }
         </div>
       </div>
       <div class="critica">
-        <span class="chip info">Atenção</span>
+        <span class="chip medio">Médio</span>
         <div>
-          <h3>Interferência entre dedos: risco pequeno, mas teste</h3>
-          <p>Com o punho fechado, as pontas dos dedos ficam a uns 17 mm umas das outras. Nessa distância, o ímã 6×3 mm do dedo vizinho chega ao sensor com uns 15–20 G, contra 700–1000 G do ímã do próprio dedo. Isso dá cerca de 2 % de interferência, e a calibração absorve.</p>
-          <p class="fix"><strong>O que fazer:</strong> não use ímã grande (8 mm ou mais) e não coloque dois sensores a menos de 1 cm um do outro. Antes de colar tudo, teste um dedo de cada vez no Monitor Serial.</p>
+          <h3>O ímã do dedo vizinho pode atrapalhar</h3>
+          <p>Os nós dos dedos ficam a uns 2 cm um do outro. Com o dedo dobrado, o seu ímã se afasta do sensor para mais ou menos 1,5 cm, enquanto o ímã do vizinho continua a uns 2 cm. No fim do movimento, o vizinho pesa quase tanto quanto o seu. Isso faz um dedo “puxar” um pouco o outro.</p>
+          <p class="fix"><strong>O que fazer:</strong> use ímã pequeno (5×2 mm), deixe cada sensor bem perto do próprio ímã e teste um dedo de cada vez no Serial Plotter antes de colar. Num punho normal todos os dedos dobram juntos, o que disfarça o efeito. Na demonstração de um dedo sozinho ele aparece mais.</p>
         </div>
       </div>
       <div class="critica">
@@ -813,7 +813,7 @@ footer.fim a { word-break: break-word; }
       <tr><td><strong>Alimentação</strong></td><td>2,7 a 6,5 V no original (clones: 3,0 V ou até 4,5 V mínimo). Funciona no Uno (5 V) e no ESP32 (3,3 V).</td><td>4,5 a 24 V. Não funciona direito em 3,3 V. No ESP32, alimente pelo VIN (5 V).</td></tr>
       <tr><td><strong>Saída</strong></td><td>Liga direto no pino analógico.</td><td>Coletor aberto: precisa de resistor pull-up.</td></tr>
       <tr><td><strong>Polo do ímã</strong></td><td>Qualquer um. O código calibra.</td><td>Só o polo sul, virado para a face com a escrita.</td></tr>
-      <tr><td><strong>No código</strong></td><td>Você escolhe o ponto em que o dedo fecha e tem uma pequena faixa gradual.</td><td>Aberto ou fechado. Aciona entre 70 e 350 G, conforme a peça, e você não escolhe.</td></tr>
+      <tr><td><strong>No código</strong></td><td>Acompanha o movimento inteiro, se o ímã e o sensor ficarem um de cada lado do nó do dedo.</td><td>Aberto ou fechado. Aciona entre 70 e 350 G, conforme a peça, e você não escolhe.</td></tr>
       <tr><td><strong>Preço</strong></td><td>R$ 18–22 o kit de 10</td><td>R$ 1–4 cada</td></tr>
       <tr><td><strong>Veredito</strong></td><td><span class="chip ok">Recomendado</span></td><td><span class="chip medio">Só se já tiver</span></td></tr>
     </tbody>
@@ -874,7 +874,7 @@ footer.fim a { word-break: break-word; }
   <div class="painel">
     <h3>Na prática, para a sua luva</h3>
     <ul class="list">
-      <li>Projete o dedo fechado com o ímã a <strong>3–4 mm</strong> do sensor. Mais perto, satura. Mais longe, o sinal fica fraco.</li>
+      <li>Na posição do nó do dedo, deixe o ímã a <strong>4–8 mm</strong> do sensor com o dedo esticado. Ao dobrar, ele vai para ~15 mm, e o sinal percorre quase toda a faixa útil.</li>
       <li>No Uno, cada passo do ADC vale uns 3,5 G. No ESP32 vale ~1 G, mas o ruído é de 10 a 20 passos. Por isso o código faz média das leituras.</li>
       <li>Use o <strong>Serial Plotter</strong> da Arduino IDE para ver a curva de cada dedo antes de colar os sensores de vez.</li>
       <li>Se o sinal ficar fraco, troque por um ímã maior ou empilhe dois de 5×2.</li>
@@ -894,95 +894,138 @@ footer.fim a { word-break: break-word; }
     <div class="sec-head">
       <span class="num">LUVA</span>
       <h2>Onde colocar sensores e ímãs</h2>
-      <p>A regra é simples: o ímã vai na parte que se move e o sensor vai na parte fixa, porque é o sensor que tem fio.</p>
+      <p>Você quer que a mão robótica acompanhe o dedo do começo ao fim, e não só no final. Para isso, o ímã e o sensor têm que ficar a poucos milímetros um do outro o tempo todo, um de cada lado de <strong>uma</strong> articulação. A melhor articulação é a da base do dedo (MCF, o “nó”). Ela dobra uns 85–90° quando você fecha a mão.</p>
     </div>
     <figure class="dg">
       <p class="dica-scroll">arraste para os lados para ver o diagrama inteiro →</p>
       <div class="scroll">
-      <svg viewBox="0 0 960 560" role="img" aria-labelledby="lt">
-        <title id="lt">Luva vista pela palma com ímãs nas pontas dos dedos e sensores na palma, e vista lateral do dedo aberto e fechado</title>
-        <text class="d-l" x="20" y="24">mão direita · palma virada para você</text>
+      <svg viewBox="0 0 960 600" role="img" aria-labelledby="lt">
+        <title id="lt">Costas da mão direita com um sensor Hall logo antes de cada nó dos dedos e um ímã logo depois, na falange proximal; vista lateral do dedo esticado e dobrado</title>
+        <text class="d-l" x="20" y="24">mão direita · costas da mão viradas para você</text>
         <g>
-          <rect class="d-glove" x="118" y="112" width="46" height="150" rx="23"/>
-          <rect class="d-glove" x="172" y="64" width="52" height="196" rx="26"/>
-          <rect class="d-glove" x="232" y="42" width="54" height="218" rx="27"/>
-          <rect class="d-glove" x="294" y="64" width="52" height="196" rx="26"/>
-          <g transform="translate(352,420) rotate(38) translate(-26,-150)">
+          <rect class="d-glove" x="126" y="64" width="52" height="196" rx="26"/>
+          <rect class="d-glove" x="186" y="42" width="54" height="218" rx="27"/>
+          <rect class="d-glove" x="248" y="64" width="52" height="196" rx="26"/>
+          <rect class="d-glove" x="308" y="112" width="46" height="150" rx="23"/>
+          <g transform="translate(120,420) rotate(-38) translate(-26,-150)">
             <rect class="d-glove" x="0" y="0" width="52" height="150" rx="26"/>
-            <circle class="d-mag" cx="26" cy="24" r="10"/>
+            <circle class="d-mag" cx="26" cy="74" r="8"/>
           </g>
           <rect class="d-glove" x="110" y="232" width="252" height="222" rx="46"/>
           <rect class="d-glove d-glove2" x="150" y="446" width="172" height="70" rx="10"/>
-          <circle class="d-mag" cx="141" cy="134" r="10"/>
-          <circle class="d-mag" cx="198" cy="86" r="10"/>
-          <circle class="d-mag" cx="259" cy="64" r="10"/>
-          <circle class="d-mag" cx="320" cy="86" r="10"/>
-          <path class="d-thin" d="M150,342 C150,400 210,420 230,470"/>
-          <path class="d-thin" d="M198,342 C198,400 222,430 234,470"/>
-          <path class="d-thin" d="M255,342 C255,400 240,430 238,470"/>
-          <path class="d-thin" d="M312,342 C312,400 254,430 242,470"/>
-          <path class="d-thin" d="M168,284 C120,320 130,420 226,470"/>
-          <rect class="d-part" x="142" y="330" width="16" height="12" rx="2"/>
-          <rect class="d-part" x="190" y="330" width="16" height="12" rx="2"/>
-          <rect class="d-part" x="247" y="330" width="16" height="12" rx="2"/>
-          <rect class="d-part" x="304" y="330" width="16" height="12" rx="2"/>
-          <rect class="d-part" x="160" y="272" width="16" height="12" rx="2"/>
+          <circle class="d-mag" cx="152" cy="212" r="8"/>
+          <circle class="d-mag" cx="213" cy="212" r="8"/>
+          <circle class="d-mag" cx="274" cy="212" r="8"/>
+          <circle class="d-mag" cx="331" cy="226" r="7"/>
+          <path class="d-thin" style="stroke-dasharray:none;opacity:.5" d="M126,244 Q236,236 356,250"/>
+          <text class="d-l" x="372" y="250">linha dos nós</text>
+          <path class="d-thin" d="M152,266 C152,380 224,420 230,470"/>
+          <path class="d-thin" d="M213,266 C213,380 232,430 234,470"/>
+          <path class="d-thin" d="M274,266 C274,380 242,430 238,470"/>
+          <path class="d-thin" d="M331,272 C331,380 250,430 242,470"/>
+          <path class="d-thin" d="M126,398 C150,430 200,450 226,470"/>
+          <rect class="d-part" x="144" y="254" width="16" height="12" rx="2"/>
+          <rect class="d-part" x="205" y="254" width="16" height="12" rx="2"/>
+          <rect class="d-part" x="266" y="254" width="16" height="12" rx="2"/>
+          <rect class="d-part" x="323" y="260" width="16" height="12" rx="2"/>
+          <rect class="d-part" x="118" y="386" width="16" height="12" rx="2"/>
           <rect class="d-part" x="206" y="466" width="60" height="22" rx="4"/>
           <text class="d-partt" x="236" y="481" text-anchor="middle">7 vias</text>
           <text class="d-l" x="236" y="536" text-anchor="middle">punho: conector + fios presos</text>
+          <path class="d-thin" d="M70,548 L122,400"/>
+          <text class="d-l" x="20" y="562">polegar: sensor no</text>
+          <text class="d-l" x="20" y="578">osso da base dele</text>
         </g>
         <g transform="translate(20,0)">
           <circle class="d-mag" cx="420" cy="470" r="8"/>
-          <text class="d-s" x="436" y="475">ímã (ponta do dedo, lado da palma)</text>
+          <text class="d-s" x="436" y="475">ímã (falange proximal, logo depois do nó)</text>
           <rect class="d-part" x="412" y="494" width="16" height="12" rx="2"/>
-          <text class="d-s" x="436" y="505">sensor Hall (onde a ponta encosta)</text>
+          <text class="d-s" x="436" y="505">sensor Hall (costas da mão, logo antes do nó)</text>
           <path class="d-thin" d="M410,530 H430"/>
-          <text class="d-s" x="436" y="535">fio fino até o punho</text>
+          <text class="d-s" x="436" y="535">fio fino, sem passar por articulação</text>
+          <text class="d-l" x="410" y="562">desenho fora de escala</text>
         </g>
 
         <line x1="520" y1="40" x2="520" y2="440" class="g-grid"/>
-        <text class="d-l" x="552" y="60">vista de lado · dedo indicador</text>
-        <rect class="d-glove" x="552" y="200" width="170" height="46" rx="16"/>
-        <text class="d-l" x="640" y="192">costas da mão</text>
-        <text class="d-l" x="560" y="278">palma</text>
-        <path d="M722,223 H880" style="stroke:var(--glove-2);stroke-width:34;stroke-linecap:round;fill:none"/>
-        <circle class="d-mag" cx="878" cy="238" r="8"/>
-        <path d="M722,223 V300 H660 L632,272" style="stroke:var(--glove-2);stroke-width:34;stroke-linecap:round;stroke-linejoin:round;fill:none;opacity:.55"/>
-        <circle class="d-mag" cx="626" cy="262" r="8"/>
-        <rect class="d-part" x="606" y="246" width="16" height="10" rx="2"/>
-        <path class="d-thin" d="M614,258 V352 H878 V252" marker-end="url(#ah-ink)"/>
-        <text class="d-lb" x="746" y="372" text-anchor="middle">aberto: ímã a ~9 cm, sensor não sente nada</text>
-        <path class="d-thin" d="M600,152 L611,244"/>
-        <text class="d-lb" x="552" y="144">fechado: ímã a 2–5 mm do sensor</text>
-        <text class="d-s" x="552" y="408">O sensor só percebe o ímã no último 1 a 1,5 cm.</text>
-        <text class="d-s" x="552" y="428">Por isso o movimento é quase liga/desliga.</text>
+        <text class="d-l" x="552" y="44">vista de lado · dedo ESTICADO</text>
+        <rect class="d-glove" x="552" y="104" width="170" height="46" rx="16"/>
+        <path d="M722,127 H900" style="stroke:var(--glove-2);stroke-width:34;stroke-linecap:round;fill:none"/>
+        <rect class="d-part" x="700" y="84" width="10" height="20" rx="2"/>
+        <rect class="d-mag" x="734" y="86" width="7" height="18" rx="2"/>
+        <path class="d-thin" d="M710,76 H734" marker-end="url(#ah-ink)"/>
+        <text class="d-lb" x="722" y="70" text-anchor="middle">~6 mm</text>
+        <text class="d-l" x="560" y="96">sensor</text>
+        <text class="d-l" x="748" y="100">ímã</text>
+        <text class="d-lb" x="552" y="184">frente a frente, perto → sinal forte</text>
+
+        <text class="d-l" x="552" y="232">vista de lado · dedo DOBRADO (~90°)</text>
+        <rect class="d-glove" x="552" y="262" width="170" height="46" rx="16"/>
+        <path d="M722,285 V380 H660" style="stroke:var(--glove-2);stroke-width:34;stroke-linecap:round;stroke-linejoin:round;fill:none"/>
+        <rect class="d-part" x="700" y="242" width="10" height="20" rx="2"/>
+        <rect class="d-mag" x="740" y="306" width="18" height="7" rx="2"/>
+        <path class="d-thin" d="M712,262 L742,304" marker-end="url(#ah-ink)"/>
+        <text class="d-lb" x="790" y="290">~15 mm</text>
+        <text class="d-lb" x="552" y="412">o ímã girou e se afastou → sinal fraco</text>
+        <text class="d-s" x="552" y="434">No meio do caminho, sinal intermediário.</text>
       </svg>
       </div>
-      <figcaption><strong>Posições aproximadas.</strong> As mãos são diferentes, então não copie o desenho. Vista a luva, feche a mão e marque com caneta onde cada ponta de dedo encosta na palma. O sensor vai exatamente ali. Para o polegar, dobre-o sobre a palma (como no gesto do número 4) e marque onde a ponta encosta.</figcaption>
+      <figcaption><strong>Um par por dedo, atravessando o nó.</strong> O sensor fica nas costas da mão, que não dobra, então o fio dele nunca passa por uma articulação. O ímã fica na falange proximal e não tem fio. Com o dedo esticado, os dois se olham de frente a uns 6 mm. Ao dobrar, o ímã gira junto com o dedo e se afasta, e o sinal cai de forma contínua até o punho fechado. Uma luva publicada em 2026 (arXiv) usa o mesmo princípio de um par por articulação.</figcaption>
     </figure>
-    <div class="aviso dica">
-      <span class="rot">E se eu inverter: sensor na ponta, ímã na palma?</span>
-      <p>Não resolve a interferência e piora a montagem. A interferência depende só da distância entre cada ímã e cada sensor com a mão fechada, e essa distância é a mesma nos dois jeitos. Com o sensor na ponta, porém, você passa 3 fios por cima de 3 articulações em cada dedo, e eles dobram toda vez que você fecha a mão. Fio fino dobrado mil vezes quebra na solda, e quase sempre no dia da apresentação. O ímã não tem fio, então é ele que vai na parte que se mexe.</p>
-      <p>E use um ímã por dedo. Um ímã só na palma não fica perto o bastante das cinco pontas ao mesmo tempo.</p>
+
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Dedo</th><th>Sensor (fixo, com fio)</th><th>Ímã (móvel, sem fio)</th><th>Dobra da articulação</th></tr></thead>
+        <tbody>
+          <tr><td>Indicador, médio, anelar, mínimo</td><td>Costas da mão, em cima do osso do metacarpo, logo antes do nó. Face da escrita virada para o dedo.</td><td>Costas da falange proximal, logo depois do nó. Face plana virada para o sensor.</td><td class="num">~85–90°</td></tr>
+          <tr><td>Polegar</td><td>Costas do osso da base do polegar (1º metacarpo), antes da articulação do meio do polegar.</td><td>Costas da falange proximal do polegar.</td><td class="num">~50–60°</td></tr>
+        </tbody>
+      </table>
     </div>
+
+    <div class="aviso dica">
+      <span class="rot">Por que não o sensor no osso distal e o ímã no proximal?</span>
+      <p>Porque volta o problema do botão liga/desliga. Com o dedo esticado, a ponta fica a uns 5–6 cm da falange proximal, longe demais para o sensor. O sinal só aparece no fim da dobra. E o osso distal é o que mais se mexe, então o fio do sensor passaria por cima de duas articulações e quebraria na solda. O mesmo vale para o sensor na ponta e o ímã na palma: a regra é ímã na parte que se mexe, sensor na parte fixa, os dois perto um do outro.</p>
+    </div>
+
+    <div class="aviso cuidado">
+      <span class="rot">Limitações desta posição</span>
+      <ul class="list">
+        <li><strong>Ela mede a dobra do nó.</strong> Num punho normal o nó dobra ~90° e funciona. Se você dobrar só as pontas dos dedos (“garra”) com o nó reto, o sensor quase não vê.</li>
+        <li><strong>A curva não é reta:</strong> o sinal muda mais rápido no começo da dobra que no fim. A calibração de aberto e fechado já resolve boa parte. Se o meio do movimento ficar estranho, dá para acrescentar um terceiro ponto de calibração (meio dobrado).</li>
+        <li><strong>A luva precisa ser justa</strong> (lycra ou ciclismo). Se ela escorregar sobre o nó, a distância muda e a leitura varia sem o dedo mexer.</li>
+        <li><strong>O ímã do vizinho atrapalha um pouco</strong> no fim da dobra. Use ímã 5×2 mm e teste dedo por dedo.</li>
+      </ul>
+    </div>
+
     <div class="duas">
+      <div class="painel">
+        <h3>Teste antes de colar qualquer coisa (30 min)</h3>
+        <ol class="list">
+          <li>Prenda com fita um sensor e um ímã no <strong>indicador</strong>, nas posições da tabela.</li>
+          <li>Rode o <code>mao_com_fio</code> e abra <em>Ferramentas → Serial Plotter</em>.</li>
+          <li>Dobre o dedo devagar, de esticado até o punho fechado.</li>
+          <li>A curva tem que ser <strong>lisa do começo ao fim</strong>, sem ficar reta (achatada) em nenhuma ponta.</li>
+          <li>Ajuste a distância entre 4 e 8 mm e teste o ímã virado dos dois lados. Fique com a combinação de maior variação.</li>
+          <li>Repita para cada dedo e marque as posições com caneta.</li>
+        </ol>
+        <p class="small">Achatada no começo quer dizer que o sensor saturou: afaste o ímã. Achatada no fim quer dizer que o ímã foi longe demais: aproxime.</p>
+      </div>
       <div class="painel">
         <h3>Como montar a luva</h3>
         <ol class="list">
-          <li>Use luva fina de tecido. Luva grossa afasta o ímã do sensor.</li>
-          <li>Cole cada ímã na ponta do dedo com cola quente ou costure dentro de um pedaço de feltro. Todos com o <strong>mesmo polo</strong> virado para a palma.</li>
-          <li>Solde 3 fios finos e flexíveis em cada sensor e isole cada perna com termo-retrátil.</li>
-          <li>Costure ou cole o sensor no ponto marcado, com a face da escrita virada para fora, na direção do ímã.</li>
-          <li>Junte os 5 VCC num fio só e os 5 GND noutro. Saem 7 fios: VCC, GND e 5 sinais.</li>
-          <li>Prenda os fios no punho com fita ou costura, para que um puxão não arranque as soldas.</li>
+          <li>Use luva fina e <strong>justa</strong>. Luva frouxa escorrega e muda a leitura.</li>
+          <li>Dobre as pernas do sensor para ele ficar “em pé”, com a face da escrita virada para o dedo. Isole cada perna com termo-retrátil.</li>
+          <li>Cole o sensor nas costas da mão com cola quente sobre um pedacinho de feltro, ou costure.</li>
+          <li>Cole o ímã em pé na falange proximal, de frente para o sensor. Todos os ímãs com o <strong>mesmo polo</strong> virado para o sensor.</li>
+          <li>Junte os 5 VCC num fio e os 5 GND noutro. Saem 7 fios: VCC, GND e 5 sinais.</li>
+          <li>Leve os fios pelas costas da mão até o punho e prenda com costura, para um puxão não arrancar as soldas.</li>
         </ol>
       </div>
-      <div class="painel">
-        <h3>Como descobrir o polo do ímã</h3>
-        <p>Com o SS49E ligado e o código de teste rodando, aproxime o ímã. Se o valor <strong>sobe</strong>, aquela face é o sul. Se <strong>desce</strong>, é o norte. Marque a face com caneta.</p>
-        <p>O código deste guia calibra sozinho e funciona com qualquer polo. O importante é que cada ímã fique sempre na mesma posição.</p>
-        <p>Com o A3144 o polo importa: ele só aciona com o <strong>polo sul</strong> virado para a face com a escrita. Se nada acontecer, vire o ímã antes de achar que o sensor queimou.</p>
-      </div>
+    </div>
+    <div class="painel read">
+      <h3>Como descobrir o polo do ímã</h3>
+      <p>Com o SS49E ligado e o código rodando, aproxime o ímã. Se o valor <strong>sobe</strong>, aquela face é o sul. Se <strong>desce</strong>, é o norte. Marque com caneta. O código calibra sozinho e aceita qualquer polo. O importante é que cada ímã fique sempre na mesma posição.</p>
+      <p>Esta posição precisa do <strong>SS49E</strong>. O A3144 só diz “perto” ou “longe” e não acompanha o movimento.</p>
     </div>
   </div>
 </section>
@@ -1360,13 +1403,16 @@ Servo servo[5];
   </ol>
   <p>Num dedo, o “aberto” pode ser um número maior que o “fechado”, dependendo do lado em que a linha foi presa. Isso é normal e o código aceita.</p>
 </div>
-    <div class="codigo"><header><div><div class="nome">mao_com_fio/mao_com_fio.ino</div><div class="placa">Arduino Uno · versão 1 · 230 linhas</div></div><button type="button">Copiar código</button></header><p class="desc">Passo 2. Lê os 5 sensores em A0 a A4, calibra no início e move os servos.</p><pre><code><span class="cm">/*
+    <div class="codigo"><header><div><div class="nome">mao_com_fio/mao_com_fio.ino</div><div class="placa">Arduino Uno · versão 1 · 233 linhas</div></div><button type="button">Copiar código</button></header><p class="desc">Passo 2. Lê os 5 sensores em A0 a A4, calibra no início e move os servos.</p><pre><code><span class="cm">/*
   ==========================================================================
   MAO ROBOTICA - VERSAO 1 (COM FIO)  -  Arduino Uno
   ==========================================================================
   O que faz:
-    Le 5 sensores Hall da luva (um por dedo). Quando o sensor chega perto
-    do ima, o dedo da mao robotica fecha. Quando afasta, o dedo abre.
+    Le 5 sensores Hall da luva (um por dedo). Cada sensor fica nas costas
+    da mao, logo antes do no do dedo, e o ima fica na falange logo depois.
+    Quando o dedo dobra, o ima gira e se afasta, e o dedo da mao robotica
+    fecha na mesma proporcao. A calibracao funciona com o sinal subindo ou
+    descendo, entao nao importa o lado do ima.
 
   Ligacoes:
     Sensores Hall (SS49E):  VCC -&gt; 5V do Uno | GND -&gt; GND | OUT -&gt; pino abaixo
@@ -2428,7 +2474,7 @@ Servo servo[5];
       <li><h3>Cinco servos com as pilhas</h3><p>Ligue os 5 servos e rode <code>teste_servos</code>. Mande todos para 0° e 180° (sem a mão montada).</p><span class="pronto">os 5 se mexem juntos e o Uno não reinicia.</span></li>
       <li><h3>Mecânica de um dedo</h3><p>Monte o indicador com tendões e calibre <code>ANG_ABERTO</code> e <code>ANG_FECHADO</code> dele.</p><span class="pronto">o dedo abre e fecha inteiro sem o servo zumbir.</span></li>
       <li><h3>Os outros quatro dedos</h3><p>Repita a calibração para cada dedo e anote os ângulos.</p><span class="pronto">todos abrem e fecham com o <code>teste_servos</code>.</span></li>
-      <li><h3>A luva</h3><p>Marque os pontos, cole os ímãs e os sensores, faça o cabo de 7 fios.</p><span class="pronto">no Monitor Serial cada dedo vai de ~0 % a ~100 % sem mexer nos vizinhos.</span></li>
+      <li><h3>A luva</h3><p>Faça o teste da fita no Serial Plotter, dedo por dedo. Depois cole sensores e ímãs e faça o cabo de 7 fios.</p><span class="pronto">cada dedo vai de ~0 % a ~100 % acompanhando o movimento inteiro, sem mexer muito os vizinhos.</span></li>
       <li><h3>Versão 1 completa</h3><p>Luva + Uno + mão. Ensaie a demonstração.</p><span class="pronto">funciona 10 minutos seguidos sem travar. <strong>Aqui o projeto já está apresentável.</strong></span></li>
       <li><h3>Rádio na bancada (versão 2)</h3><p>Dois ESP32 na mesa, sem sensores: grave os sketches e veja no Monitor Serial do receptor os pacotes chegando.</p><span class="pronto">o LED do receptor fica aceso e apaga quando você desliga a luva.</span></li>
       <li><h3>Versão 2 completa</h3><p>Sensores no ESP32 da luva, receptor no D0 do Uno, grave <code>mao_sem_fio</code>.</p><span class="pronto">funciona andando pela sala, e a mão abre sozinha quando a luva é desligada.</span></li>
@@ -2452,6 +2498,7 @@ Servo servo[5];
           <tr><td>Servo não se mexe</td><td>Fio laranja no pino errado, ou pilhas desligadas</td><td>Confira a tabela de pinos. Rode o <code>teste_servos</code>.</td></tr>
           <tr><td>Servo zumbe parado e esquenta</td><td>Ângulo além do que o dedo alcança</td><td>Reduza <code>ANG_FECHADO</code> (ou aumente <code>ANG_ABERTO</code>) alguns graus.</td></tr>
           <tr><td>Sensor sempre no mesmo valor</td><td>Sensor ao contrário, sem VCC, ou ímã longe</td><td>Confira a pinagem pela face com a escrita. Meça a saída: sem ímã ela fica perto da metade de VCC.</td></tr>
+          <tr><td>Leitura muda sem você mexer o dedo</td><td>Luva escorregando sobre o nó</td><td>Use luva mais justa ou prenda a luva com velcro no punho e entre os dedos.</td></tr>
           <tr><td>Dedo errado fecha</td><td>Ímã vizinho perto demais, ou fios trocados</td><td>Teste um dedo por vez no Monitor Serial. Use ímã menor ou afaste o sensor.</td></tr>
           <tr><td>A3144 não reage</td><td>Polo errado do ímã, ou sem pull-up</td><td>Vire o ímã. No ESP32 coloque o resistor de 10 kΩ.</td></tr>
           <tr><td>ESP32: leitura sempre 0 ou 4095</td><td>Pino do ADC2 com rádio ligado</td><td>Use só os pinos 32 a 39.</td></tr>
@@ -2479,7 +2526,7 @@ Servo servo[5];
       <details open><summary>Por que usar ESP32 se o Arduino já faz tudo?</summary><p>“Para tirar o fio entre o operador e a mão. O Uno continua controlando os servos. O ESP32 só cuida da comunicação sem fio, que o Uno não tem. Isso permite operar a mão à distância, como em robôs de resgate ou de laboratório.”</p></details>
       <details><summary>Por que não ligou os servos no 5V do Arduino?</summary><p>“Cada SG90 pode puxar centenas de miliamperes quando força, e cinco passam de 3 A. O 5V do Uno na USB fornece uns 500 mA. Por isso os servos têm pilhas próprias, com o GND ligado ao do Arduino para o sinal ter a mesma referência.”</p></details>
       <details><summary>Como funciona o sensor Hall?</summary><p>“Quando passa corrente por uma plaquinha de semicondutor dentro de um campo magnético, aparece uma pequena tensão nos lados dela. Esse é o efeito Hall. O SS49E amplifica essa tensão e entrega um valor proporcional ao campo.”</p></details>
-      <details><summary>Por que o dedo fecha de uma vez e não aos poucos?</summary><p>“Porque o campo do ímã cai muito rápido com a distância, mais ou menos com o cubo dela. O sensor só sente o ímã no último centímetro do movimento. Eu suavizei o movimento no código, mas para ter controle proporcional de verdade o certo seria um sensor flexível.” Essa resposta mostra que você conhece a limitação do próprio projeto, e isso conta ponto.</p></details>
+      <details><summary>Por que o sensor fica no nó do dedo, e não na palma?</summary><p>“O campo do ímã cai mais ou menos com o cubo da distância. Se o ímã só se aproximasse do sensor, o sinal apareceria apenas no último centímetro e o dedo fecharia de uma vez. Com um de cada lado do nó, a poucos milímetros, o ímã gira e se afasta aos poucos quando o dedo dobra, e o sinal acompanha o movimento inteiro. Como o sensor fica nas costas da mão, o fio dele não passa por nenhuma articulação.” Se perguntarem a limitação: “ele mede a dobra da base do dedo, não das pontas.”</p></details>
       <details><summary>O que acontece se o sinal sem fio cair?</summary><p>“Se o Uno fica meio segundo sem receber dados válidos, ele abre a mão sozinho. Isso é um failsafe: uma falha de comunicação nunca deixa a mão travada apertando alguma coisa.”</p></details>
       <details><summary>Como o Uno sabe que os dados chegaram certos?</summary><p>“Cada pacote começa com um byte de cabeçalho e termina com uma soma de verificação (XOR). Se a conta não bate, o pacote é descartado.”</p></details>
       <details><summary>Quanto custou?</summary><p>Tenha o número na ponta da língua, somando a tabela da seção Compras.</p></details>

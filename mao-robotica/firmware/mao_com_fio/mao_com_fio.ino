@@ -3,8 +3,11 @@
   MAO ROBOTICA - VERSAO 1 (COM FIO)  -  Arduino Uno
   ==========================================================================
   O que faz:
-    Le 5 sensores Hall da luva (um por dedo). Quando o sensor chega perto
-    do ima, o dedo da mao robotica fecha. Quando afasta, o dedo abre.
+    Le 5 sensores Hall da luva (um por dedo). Cada sensor fica nas costas
+    da mao, logo antes do no do dedo, e o ima fica na falange logo depois.
+    Quando o dedo dobra, o ima gira e se afasta, e o dedo da mao robotica
+    fecha na mesma proporcao. A calibracao funciona com o sinal subindo ou
+    descendo, entao nao importa o lado do ima.
 
   Ligacoes:
     Sensores Hall (SS49E):  VCC -> 5V do Uno | GND -> GND | OUT -> pino abaixo
