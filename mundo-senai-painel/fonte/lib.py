@@ -14,8 +14,9 @@ class Font:
         self.tt = TTFont(path)
         self.gs = self.tt.getGlyphSet()
         self.upem = self.tt["head"].unitsPerEm
-        self.cap = self.tt["OS/2"].sCapHeight / self.upem
-        self.xh = self.tt["OS/2"].sxHeight / self.upem
+        os2 = self.tt["OS/2"]
+        self.cap = (getattr(os2, "sCapHeight", 0) or 0.72 * self.upem) / self.upem
+        self.xh = (getattr(os2, "sxHeight", 0) or 0.53 * self.upem) / self.upem
         self.order = self.tt.getGlyphOrder()
         self.hb = hb.Font(hb.Face(hb.Blob.from_file_path(path)))
 
